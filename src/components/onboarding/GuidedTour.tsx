@@ -5,8 +5,8 @@ import { useT } from '../../i18n';
 import { canGoBack, clipBox, placeBubble, TOUR_STEPS, type Box } from '../../lib/onboarding';
 import { useOnboardingStore, useTourStep } from '../../store/onboardingStore';
 
-/** Taille de la bulle avant sa première mesure (largeur de `w-72`). */
-const BUBBLE_FALLBACK = { width: 288, height: 180 };
+/** Taille de la bulle avant sa première mesure (largeur de `w-80`). */
+const BUBBLE_FALLBACK = { width: 320, height: 180 };
 /** Marge du halo autour de l'élément visé. */
 const SPOT_PADDING = 6;
 
@@ -143,6 +143,7 @@ export function GuidedTour() {
   const at = (box: { left: number; top: number }) => ({ left: box.left - origin.left, top: box.top - origin.top });
   const isFirst = stepIndex === 0;
   const isLast = stepIndex === TOUR_STEPS.length - 1;
+  const hasBack = canGoBack(stepIndex);
   const bodyKey = (layout.variant && step.variantBodyKeys?.[layout.variant]) || step.bodyKey;
 
   return createPortal(
@@ -175,24 +176,27 @@ export function GuidedTour() {
         aria-modal="false"
         aria-labelledby="tour-title"
         aria-describedby="tour-body"
-        className="pointer-events-auto absolute w-72 max-w-[calc(100vw-2rem)] rounded-2xl border bg-card p-4 text-card-foreground shadow-soft animate-in fade-in-0 zoom-in-95 duration-200"
+        className="pointer-events-auto absolute w-80 max-w-[calc(100vw-2rem)] rounded-2xl border bg-card p-4 text-card-foreground shadow-soft animate-in fade-in-0 zoom-in-95 duration-200"
         style={at(layout.bubble)}
       >
-        <p className="text-xs font-medium text-muted-foreground">
-          {t('tour.progress', { current: stepIndex + 1, total: TOUR_STEPS.length })}
-        </p>
+        {/* « Passer la visite » en lien discret sur la ligne de l'étape : les boutons du bas tiennent sur une ligne. */}
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+          <p className="text-xs font-medium text-muted-foreground">
+            {t('tour.progress', { current: stepIndex + 1, total: TOUR_STEPS.length })}
+          </p>
+          <Button variant="link" size="sm" className="h-auto p-0 text-xs text-muted-foreground" onClick={skip}>
+            {t('tour.skip')}
+          </Button>
+        </div>
         <h2 id="tour-title" className="mt-1 text-base font-semibold">
           {t(step.titleKey)}
         </h2>
         <p id="tour-body" className="mt-1 text-sm text-muted-foreground">
           {t(bodyKey)}
         </p>
-        <div className="mt-4 flex items-center justify-between gap-2">
-          <Button variant="ghost" size="sm" onClick={skip}>
-            {t('tour.skip')}
-          </Button>
-          <div className="flex gap-2">
-            {canGoBack(stepIndex) && (
+        {(hasBack || !step.advanceOn) && (
+          <div className="mt-4 flex flex-wrap justify-end gap-2">
+            {hasBack && (
               <Button variant="outline" size="sm" onClick={back}>
                 {t('tour.back')}
               </Button>
@@ -203,7 +207,7 @@ export function GuidedTour() {
               </Button>
             )}
           </div>
-        </div>
+        )}
       </div>
     </div>,
     layout.host
