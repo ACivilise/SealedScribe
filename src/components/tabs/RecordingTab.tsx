@@ -4,6 +4,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { Mic, Square, Check, AlertTriangle, RefreshCw, Info } from 'lucide-react';
 import { useMeetingStore, MeetingSession } from '../../store/meetingStore';
+import { useOnboardingStore } from '../../store/onboardingStore';
 import { useNotificationStore } from '../../store/notificationStore';
 import { appConfig } from '../../config/app.config';
 import { useT } from '../../i18n';
@@ -64,6 +65,7 @@ export default function RecordingTab() {
   const autoStoppedRef = useRef<(reason: AutoStopReason) => void>(() => {});
 
   const { addMeeting } = useMeetingStore();
+  const notifyTour = useOnboardingStore((state) => state.notify);
   const setAppError = useNotificationStore((state) => state.setError);
   const setRecordingTask = useTaskStore((state) => state.setRecording);
   const clearAppError = useNotificationStore((state) => state.clearError);
@@ -329,6 +331,12 @@ export default function RecordingTab() {
     clearAppError();
   }, [resetTranscription, clearAppError]);
 
+  // Visite guidée : démarrer puis arrêter (bouton, zone de notification ou arrêt automatique) la fait avancer.
+  useEffect(() => {
+    if (recordingState === 'recording') notifyTour('recording-started');
+    else if (recordingState === 'saving') notifyTour('recording-stopped');
+  }, [recordingState, notifyTour]);
+
   const handleSave = () => {
     const newMeeting: MeetingSession = {
       id: sessionId || uuidv4(),
@@ -354,6 +362,7 @@ export default function RecordingTab() {
 
     addMeeting(newMeeting);
     resetForm();
+    notifyTour('meeting-saved');
   };
 
   const handleRetryTranscription = async () => {
@@ -386,7 +395,7 @@ export default function RecordingTab() {
           className="flex w-full flex-col items-center space-y-6"
         >
           <div className="w-full max-w-sm space-y-4">
-            <div className="space-y-2">
+            <div className="space-y-2" data-tour="meeting-language">
               <Label htmlFor="recording-language">{t('record.language')}</Label>
               <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger id="recording-language">
@@ -401,6 +410,7 @@ export default function RecordingTab() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-4" data-tour="audio-devices">
             <AudioDeviceSelect
               id="recording-input"
               label={t('record.microphone')}
@@ -419,6 +429,7 @@ export default function RecordingTab() {
               onChange={setOutput}
               onOpen={refreshDevices}
             />
+            </div>
           </div>
 
           {/* Big Start Button */}
@@ -426,6 +437,7 @@ export default function RecordingTab() {
             type="button"
             onClick={handleStart}
             aria-label={t('record.startAria')}
+            data-tour="record-start"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
             className="flex h-28 w-28 flex-col items-center justify-center gap-1 rounded-full bg-primary text-primary-foreground shadow-card transition-all duration-200 hover:bg-primary/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -495,6 +507,7 @@ export default function RecordingTab() {
             type="button"
             onClick={handleStop}
             aria-label={t('record.stopAria')}
+            data-tour="record-stop"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
             className="flex h-28 w-28 flex-col items-center justify-center gap-1 rounded-full bg-destructive text-primary-foreground shadow-card transition-all duration-200 hover:bg-destructive/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -661,7 +674,7 @@ export default function RecordingTab() {
                 </div>
               )}
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-3 pt-2" data-tour="meeting-save">
                 <Button variant="outline" className="flex-1" onClick={() => setConfirmDiscardOpen(true)}>
                   {t('record.discard')}
                 </Button>
@@ -689,6 +702,7 @@ export default function RecordingTab() {
               onClick={() => {
                 setConfirmDiscardOpen(false);
                 resetForm();
+                notifyTour('meeting-discarded');
               }}
             >
               {t('record.discard')}

@@ -59,7 +59,7 @@ impl StorageService {
                 save_locally: true,
                 theme: "system".to_string(),
                 recordings_directory: crate::models::default_recordings_directory(),
-                transcription_engine: crate::models::default_transcription_engine(),
+                transcription_engine: crate::models::new_install_transcription_engine(),
                 local_model: crate::models::default_local_model(),
                 summary_engine: crate::models::default_summary_engine(),
                 local_llm_url: String::new(),
@@ -142,7 +142,8 @@ mod tests {
         let loaded = fx.service.load_preferences().unwrap();
         assert_eq!(loaded.default_language, "en-US");
         assert!(loaded.auto_summary);
-        assert_eq!(loaded.transcription_engine, "azure");
+        // Nouvelle installation : moteur local, sans clé à saisir.
+        assert_eq!(loaded.transcription_engine, "local");
         assert!(!loaded.recordings_directory.is_empty());
     }
 

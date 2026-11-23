@@ -19,6 +19,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useT } from '../i18n';
 import { UpdateBanner } from '../components/common/UpdateBanner';
+import { GuidedTour } from '../components/onboarding/GuidedTour';
+import { useOnboardingStore, useTourStep } from '../store/onboardingStore';
 
 type TabType = 'recording' | 'recordings' | 'prompts' | 'lexicons';
 
@@ -49,6 +51,28 @@ export default function MainApp() {
   const clearError = useNotificationStore((state) => state.clearError);
   const syncFromDisk = useMeetingStore((state) => state.syncFromDisk);
   const { t } = useT();
+  const tourStep = useTourStep();
+  const notifyTour = useOnboardingStore((state) => state.notify);
+
+  // Premier lancement : visite guidée, des Paramètres jusqu'au premier enregistrement.
+  useEffect(() => {
+    useOnboardingStore.getState().startIfNew();
+  }, []);
+
+  // Chaque étape de la visite affiche l'écran qui contient l'élément qu'elle présente.
+  useEffect(() => {
+    if (!tourStep) return;
+    if (tourStep.scope === 'settings') setShowSettings(true);
+    if (tourStep.mainTab) {
+      setOpenMeetingId(null);
+      setActiveTab(tourStep.mainTab);
+    }
+  }, [tourStep]);
+
+  const closeSettings = () => {
+    setShowSettings(false);
+    notifyTour('settings-closed');
+  };
 
   // Au lancement et à chaque ouverture de l'onglet Réunions (le dossier a pu changer dans les Paramètres).
   useEffect(() => {
@@ -96,7 +120,7 @@ export default function MainApp() {
               <Mic className="h-4 w-4" />
               {t('nav.record')}
             </TabsTrigger>
-            <TabsTrigger value="recordings" title={t('nav.meetingsHint')}>
+            <TabsTrigger value="recordings" title={t('nav.meetingsHint')} data-tour="meetings-tab">
               <Folder className="h-4 w-4" />
               {t('nav.meetings')}
               {meetings.length > 0 && (
@@ -160,7 +184,8 @@ export default function MainApp() {
         </main>
       </Tabs>
 
-      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showSettings && <SettingsModal onClose={closeSettings} />}
+      <GuidedTour />
     </div>
   );
 }

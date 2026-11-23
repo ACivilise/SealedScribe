@@ -40,6 +40,7 @@ import type { MessageKey } from '../../i18n';
 import { useThemeStore } from '../../store/themeStore';
 import { useSkinStore } from '../../store/skinStore';
 import { useUpdateStore, type CheckOutcome } from '../../store/updateStore';
+import { useOnboardingStore, useTourStep } from '../../store/onboardingStore';
 import { isSkin, SKINS, type Skin } from '../../lib/skins';
 import { AVAILABLE_LOCALES, useLocaleStore, useT, type LocalePreference } from '../../i18n';
 import pkg from '../../../package.json';
@@ -167,6 +168,12 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
   const [aiModel, setAiModel] = useState('');
   const [mistralKey, setMistralKey] = useState('');
   const [tab, setTab] = useState<SettingsTab>('general');
+  // Visite guidée : chaque étape affiche l'onglet qui contient l'élément qu'elle présente.
+  const tourTab = useTourStep()?.settingsTab;
+  useEffect(() => {
+    if (tourTab) setTab(tourTab);
+  }, [tourTab]);
+  const startTour = useOnboardingStore((state) => state.start);
   const [confirmRemoveKeys, setConfirmRemoveKeys] = useState<KeysGroup | null>(null);
   const [localModels, setLocalModels] = useState<LocalModelsState>({ status: 'idle', models: [] });
   /** Numéro de la dernière recherche de modèles : une réponse plus ancienne est ignorée. */
@@ -393,7 +400,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
     </div>
   );
 
-  const engine: TranscriptionEngine = preferences?.transcription_engine ?? 'azure';
+  const engine: TranscriptionEngine = preferences?.transcription_engine ?? 'local';
   const selectedModelId = preferences?.local_model ?? 'large-v3-turbo';
   const selectedModel = localWhisper.status?.models.find((m) => m.id === selectedModelId);
   const selectedModelText = LOCAL_MODEL_TEXT[selectedModelId];
@@ -524,7 +531,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && handleCancel()}>
-      <DialogContent className="max-w-lg gap-0 p-0">
+      <DialogContent data-tour-container="" className="max-w-lg gap-0 p-0">
         <DialogHeader className="border-b p-6 pr-12">
           <DialogTitle>{t('settings.title')}</DialogTitle>
           <DialogDescription className="sr-only">{t('settings.description')}</DialogDescription>
@@ -582,7 +589,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
               </section>
 
               {/* Appearance */}
-              <section aria-labelledby="settings-appearance" className="space-y-4">
+              <section aria-labelledby="settings-appearance" data-tour="settings-appearance" className="space-y-4">
                 <h3 id="settings-appearance" className="text-sm font-semibold">
                   {t('settings.appearance')}
                 </h3>
@@ -733,6 +740,9 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                   >
                     {checkingUpdate ? t('update.checking') : t('update.check')}
                   </Button>
+                  <Button variant="outline" size="sm" onClick={startTour}>
+                    {t('settings.replayTour')}
+                  </Button>
                   {updateOutcome && !checkingUpdate && (
                     <span role="status" className="text-xs text-muted-foreground">
                       {updateOutcome === 'upToDate'
@@ -754,7 +764,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                   {t('settings.transcription')}
                 </h3>
 
-                <div className="space-y-2">
+                <div className="space-y-2" data-tour="transcription-engine">
                   <Label htmlFor="settings-engine">{t('settings.engine')}</Label>
                   <Select value={engine} onValueChange={handleEngineChange} disabled={!preferences || isSaving}>
                     <SelectTrigger id="settings-engine" className="w-full">
@@ -771,6 +781,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                   </p>
                 </div>
 
+                <div className="space-y-4" data-tour="transcription-setup" data-tour-variant={engine}>
                 {engine === 'local' ? (
                   <>
                     <div className="space-y-2">
@@ -944,6 +955,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                     </p>
                   </>
                 )}
+                </div>
               </section>
 
               <DiarizationSettings localWhisper={localWhisper} />
@@ -976,7 +988,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
               <section aria-labelledby="settings-ai" className="space-y-4">
                 <h3 id="settings-ai" className="sr-only">{t('settings.tabAi')}</h3>
 
-                <div className="space-y-2">
+                <div className="space-y-2" data-tour="summary-engine">
                   <Label htmlFor="settings-summary-engine">{t('settings.summaryEngine')}</Label>
                   <Select value={summaryEngine} onValueChange={handleSummaryEngineChange} disabled={!preferences || isSaving}>
                     <SelectTrigger id="settings-summary-engine" className="w-full">
@@ -1170,7 +1182,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
               <AlertDescription>{saveError}</AlertDescription>
             </Alert>
           )}
-          <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end" data-tour="settings-actions">
             <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
               {t('common.cancel')}
             </Button>

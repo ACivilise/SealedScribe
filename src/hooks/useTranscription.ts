@@ -207,7 +207,7 @@ export function useTranscription(
       onStart?.();
       // Même lecture que le backend au lancement : sert à proposer l'arrêt après la partie en cours.
       invoke<{ transcription_engine?: string }>('load_preferences')
-        .then((prefs) => patch({ engine: prefs.transcription_engine ?? 'azure' }))
+        .then((prefs) => patch({ engine: prefs.transcription_engine ?? 'local' }))
         .catch(() => {
           // Hors Tauri : moteur inconnu, seul l'arrêt immédiat est proposé.
         });

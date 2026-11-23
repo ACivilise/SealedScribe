@@ -6,6 +6,8 @@ import SettingsModal from './SettingsModal';
 import type { UserPreferences } from '../../services/preferencesService';
 import type { LocalLlmModel } from '../../services/summaryService';
 import { useSkinStore } from '../../store/skinStore';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import { TOUR_STEPS } from '../../lib/onboarding';
 
 vi.mock('@tauri-apps/api/core', () => ({ invoke: vi.fn() }));
 vi.mock('@tauri-apps/api/event', () => ({ listen: vi.fn().mockResolvedValue(() => {}) }));
@@ -238,5 +240,25 @@ describe('SettingsModal — habillage', () => {
     expect(useSkinStore.getState().skin).toBe('cassette');
     expect(document.documentElement.dataset.skin).toBe('cassette');
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+describe('SettingsModal — visite guidée', () => {
+  beforeEach(() => {
+    useOnboardingStore.setState({ completed: true, stepIndex: null });
+  });
+
+  it('affiche l’onglet qui contient l’élément présenté par l’étape en cours', async () => {
+    mockBackend(prefs({ transcription_engine: 'local' }), async () => []);
+    useOnboardingStore.setState({ stepIndex: TOUR_STEPS.findIndex((step) => step.id === 'engine') });
+    render(<SettingsModal onClose={vi.fn()} />);
+    expect(await screen.findByRole('tab', { name: 'Transcription', selected: true })).toBeInTheDocument();
+  });
+
+  it('« Revoir la visite guidée » la relance depuis le début', async () => {
+    mockBackend(prefs(), async () => []);
+    render(<SettingsModal onClose={vi.fn()} />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Replay the guided tour' }));
+    expect(useOnboardingStore.getState().stepIndex).toBe(0);
   });
 });

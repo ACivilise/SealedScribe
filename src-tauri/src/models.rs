@@ -59,7 +59,8 @@ pub struct UserPreferences {
     pub theme: String,
     #[serde(default = "default_recordings_directory")]
     pub recordings_directory: String,
-    /// Moteur de transcription : "azure" (défaut), "local" (whisper.cpp) ou "mistral" (Voxtral).
+    /// Moteur de transcription : "azure", "local" (whisper.cpp) ou "mistral" (Voxtral). Nouvelle
+    /// installation : "local" (`new_install_transcription_engine`).
     #[serde(default = "default_transcription_engine")]
     pub transcription_engine: String,
     /// Modèle utilisé par le moteur local (voir `services::local_whisper`).
@@ -93,8 +94,14 @@ pub struct UserPreferences {
     pub azure_ad_tenant_id: String,
 }
 
+/// Fichiers `preferences.json` écrits avant le choix du moteur : Azure, seul moteur à l'époque.
 pub fn default_transcription_engine() -> String {
     "azure".to_string()
+}
+
+/// Nouvelle installation : le modèle local, utilisable sans compte ni clé.
+pub fn new_install_transcription_engine() -> String {
+    "local".to_string()
 }
 
 pub fn default_local_model() -> String {
