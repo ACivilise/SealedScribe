@@ -7,6 +7,31 @@ src/lib/releaseNotes.test.ts fait échouer les tests s'il dérive ou si la derni
 pas à package.json, src-tauri/tauri.conf.json et src-tauri/Cargo.toml.
 -->
 
+## 0.5.0 — 2026-11-23 — MeetScribe devient SealedScribe
+
+### Nouveautés
+- **SealedScribe, logiciel libre.** MeetScribe s’appelle désormais SealedScribe, et son code est
+  publié sur GitHub sous licence libre GPL-3.0. Vos réunions, prompts, lexiques et clés sont
+  conservés.
+- **Mises à jour depuis l’app.** Quand une nouvelle version sort, un bandeau la signale en haut de
+  la fenêtre : « Installer » la télécharge, puis SealedScribe se ferme et redémarre à jour.
+  L’installation attend la fin d’un enregistrement ou d’un traitement en cours. Pour vérifier à la
+  demande : « Rechercher une mise à jour », dans Paramètres > Général > À propos.
+- **Quatre habillages.** Dans Paramètres > Général > Apparence > Habillage : Cassette, inspiré des
+  platines des années 80 (par défaut), Terminal, Journal et Glacier, chacun en thème clair et
+  sombre. Le passage au thème clair ou sombre se déroule comme une bande qui avance.
+- **Choix du micro et de la sortie audio.** L’onglet Enregistrer liste les micros et les sorties
+  audio branchés ; le son de la réunion est capté sur la sortie choisie. Le choix est mémorisé ;
+  un périphérique débranché est remplacé par celui de Windows, avec un avertissement.
+
+### Corrections
+- **Plus d’intervenant muet.** Un passage sans parole ne crée plus d’intervenant qui ne dit rien ;
+  les transcriptions déjà enregistrées sont nettoyées à l’ouverture.
+- **Intervenants de même nom réunis.** Donner à un intervenant le nom d’un autre les regroupe sous un
+  seul numéro, dans la transcription affichée et dans toutes ses versions.
+- **Jauge d’enregistrement stable.** Pendant l’enregistrement, la forme d’onde garde sa hauteur : la
+  fenêtre ne tremble plus. Le pourcentage du niveau audio disparaît, et un son faible reste visible.
+
 ## 0.4.2 — 2026-11-18 — Séparation des voix toujours à jour
 
 ### Améliorations
