@@ -7,6 +7,19 @@ src/lib/releaseNotes.test.ts fait échouer les tests s'il dérive ou si la derni
 pas à package.json, src-tauri/tauri.conf.json et src-tauri/Cargo.toml.
 -->
 
+## 0.5.1 — 2026-11-23 — Visite guidée
+
+### Nouveautés
+- **Visite guidée au premier lancement.** Les Paramètres s’ouvrent et une visite vous accompagne
+  jusqu’à votre premier enregistrement : langue et apparence, moteur de transcription, résumé,
+  puis micro, sortie audio, « Démarrer », « Arrêter » et « Enregistrer la réunion ».
+  Elle avance quand vous faites ce qu’elle indique ; « Passer la visite » l’arrête,
+  et « Revoir la visite guidée », dans Paramètres > Général > À propos, la relance.
+
+### Améliorations
+- **Transcription locale par défaut.** Une nouvelle installation transcrit avec le modèle local,
+  sur ce PC, sans compte ni clé à saisir. Les réglages existants ne changent pas.
+
 ## 0.5.0 — 2026-11-23 — MeetScribe devient SealedScribe
 
 ### Nouveautés

@@ -1,6 +1,6 @@
 {
   "name": "meetscribe",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Intelligent meeting recording and transcription desktop application",
   "license": "GPL-3.0-or-later",
   "type": "module",
