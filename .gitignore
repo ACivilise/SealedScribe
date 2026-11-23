@@ -1,0 +1,90 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+*.lock
+
+# Build outputs
+dist/
+build/
+*.wasm
+*.wasm.js
+
+# Vite
+.vite/
+.vite-cache/
+
+# Tauri
+src-tauri/target/
+src-tauri/Cargo.lock
+libexec/
+
+# Rust
+target/
+Cargo.lock
+*.rs.bk
+*.pdb
+
+# IDE and Editor
+.vscode/
+.idea/
+.sublime-project
+.sublime-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# OS specific
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Build artifacts
+*.rlib
+*.rmeta
+
+# Tauri app builds
+src-tauri/icons/*
+!src-tauri/icons/*.png
+!src-tauri/icons/*.ico
+
+# Private files
+*.pem
+
+# Enregistrements audio de test (ne jamais versionner)
+*.wav
+*.mp3
+*.m4a

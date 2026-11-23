@@ -1,0 +1,508 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap')
+layer(base);
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * `inline` : les utilitaires reçoivent directement `hsl(var(--x))` et se résolvent
+ * sur l'élément, ce qui permet à `.dark` de surcharger les tokens, et évite les
+ * auto-références (--shadow-soft: var(--shadow-soft)).
+ */
+@theme inline {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+
+  --color-brand: hsl(var(--brand));
+  --color-brand-text: hsl(var(--brand-text));
+
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --font-sans: DM Sans, Segoe UI, Roboto, sans-serif;
+  --font-mono: Cascadia Code, SFMono-Regular, Consolas, monospace;
+
+  --shadow-soft: var(--shadow-soft);
+  --shadow-card: var(--shadow-card);
+  --shadow-focus: var(--shadow-focus);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+/*
+ * Tokens de thème « cassette », inspirés des platines et des cassettes audio des années 80.
+ * Clair : l'étiquette de la cassette (papier crème, encre brune, orange brûlé, rouge du bouton
+ * d'enregistrement, ocre et sarcelle d'époque). Sombre : la façade de la platine (anthracite
+ * chaud, accent ambre des afficheurs, texte foncé sur l'ambre).
+ * Les variables shadcn (--primary, --card…) sont des triplets HSL pour que Tailwind gère les
+ * opacités (bg-primary/90). Les tokens décoratifs et les ombres sont en CSS brut.
+ * Contrastes vérifiés (WCAG AA, 4,5:1 pour le texte) dans les deux thèmes.
+ * Mode sombre : classe `dark` sur <html> (géré par themeStore).
+ */
+@layer base {
+  :root {
+    color-scheme: light;
+
+    --background: 40 45% 95%;
+    --foreground: 25 28% 14%;
+    --card: 42 60% 98%;
+    --card-foreground: 25 28% 14%;
+    --popover: 42 60% 98%;
+    --popover-foreground: 25 28% 14%;
+    --primary: 22 85% 38%;
+    --primary-foreground: 40 60% 98%;
+    --secondary: 38 32% 89%;
+    --secondary-foreground: 25 28% 14%;
+    --muted: 38 32% 89%;
+    --muted-foreground: 28 16% 35%;
+    --accent: 36 70% 91%;
+    --accent-foreground: 25 28% 14%;
+    --destructive: 4 70% 42%;
+    --destructive-foreground: 40 60% 98%;
+    --success: 170 60% 24%;
+    --success-foreground: 40 60% 98%;
+    --warning: 36 90% 28%;
+    --warning-foreground: 40 60% 98%;
+    --border: 35 24% 80%;
+    --input: 32 16% 62%;
+    --ring: 26 90% 46%;
+    --radius: 0.75rem;
+
+    /* Orange de bande vif (décor) ; `brand-text` pour du texte orange lisible (5,3:1 sur le fond). */
+    --brand: 26 90% 46%;
+    --brand-text: 22 85% 36%;
+
+    /* Décor sous l'en-tête (Cassette : trois rayures moutarde, orange, rouge). */
+    --header-band: linear-gradient(180deg, hsl(40 85% 52%) 0 33.4%, hsl(24 88% 50%) 33.4% 66.7%, hsl(6 72% 46%) 66.7% 100%);
+
+    /* Police du texte et arrondi des boutons : propres à chaque habillage. */
+    --font-body: 'DM Sans', 'Segoe UI', Roboto, sans-serif;
+    --radius-button: 9999px;
+
+    --shadow-card: 0 12px 30px rgba(46, 34, 26, 0.1);
+    --shadow-soft: 0 20px 50px rgba(46, 34, 26, 0.1);
+    --shadow-focus: 0 0 0 3px rgba(223, 103, 12, 0.25);
+    --surface-overlay: rgba(46, 34, 26, 0.45);
+    --page-gradient: linear-gradient(180deg, #fbf6ec 0%, #f6efe3 50%, #f9f4ea 100%);
+    --page-glow-1: rgba(224, 112, 20, 0.08);
+    --page-glow-2: rgba(232, 163, 61, 0.1);
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    --background: 30 10% 8%;
+    --foreground: 40 35% 89%;
+    --card: 30 9% 12%;
+    --card-foreground: 40 35% 89%;
+    --popover: 30 9% 12%;
+    --popover-foreground: 40 35% 89%;
+    --primary: 32 95% 56%;
+    --primary-foreground: 28 45% 9%;
+    --secondary: 30 8% 17%;
+    --secondary-foreground: 40 35% 89%;
+    --muted: 30 8% 17%;
+    --muted-foreground: 36 14% 65%;
+    --accent: 30 10% 19%;
+    --accent-foreground: 40 35% 89%;
+    --destructive: 5 80% 64%;
+    --destructive-foreground: 28 45% 9%;
+    --success: 165 50% 50%;
+    --success-foreground: 28 45% 9%;
+    --warning: 42 92% 58%;
+    --warning-foreground: 28 45% 9%;
+    --border: 30 8% 22%;
+    --input: 30 6% 36%;
+    --ring: 32 95% 58%;
+
+    --brand: 30 92% 52%;
+    --brand-text: 33 95% 62%;
+
+    --header-band: linear-gradient(180deg, hsl(42 90% 58%) 0 33.4%, hsl(28 92% 54%) 33.4% 66.7%, hsl(6 75% 58%) 66.7% 100%);
+
+    --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.45);
+    --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.5);
+    --shadow-focus: 0 0 0 3px rgba(250, 155, 46, 0.35);
+    --surface-overlay: rgba(0, 0, 0, 0.6);
+    --page-gradient: linear-gradient(180deg, #17140f 0%, #1b1713 50%, #12100d 100%);
+    --page-glow-1: rgba(249, 150, 36, 0.1);
+    --page-glow-2: rgba(200, 68, 42, 0.1);
+  }
+
+  /*
+   * Autres habillages (Paramètres > Général > Apparence), posés par `data-skin` sur <html>.
+   * Chacun redéfinit tous les tokens ci-dessus : le bloc `[data-skin='x']` sert au thème clair
+   * et porte aussi la police, les arrondis et le décor ; le bloc `[data-skin='x'].dark`, plus
+   * spécifique, sert au thème sombre. Un nouveau token doit être défini dans chaque habillage.
+   * `--radius-2xl` (cartes, modales) surcharge la valeur par défaut de Tailwind.
+   */
+
+  /* Terminal : papier listing à bandes vertes (clair), écran à phosphore vert (sombre). */
+  [data-skin='terminal'] {
+    --background: 100 30% 96%;
+    --foreground: 150 60% 12%;
+    --card: 100 40% 99%;
+    --card-foreground: 150 60% 12%;
+    --popover: 100 40% 99%;
+    --popover-foreground: 150 60% 12%;
+    --primary: 150 70% 24%;
+    --primary-foreground: 100 40% 99%;
+    --secondary: 110 22% 90%;
+    --secondary-foreground: 150 60% 12%;
+    --muted: 110 22% 90%;
+    --muted-foreground: 150 18% 30%;
+    --accent: 120 40% 90%;
+    --accent-foreground: 150 60% 12%;
+    --destructive: 0 70% 40%;
+    --destructive-foreground: 100 40% 99%;
+    --success: 190 80% 24%;
+    --success-foreground: 100 40% 99%;
+    --warning: 40 90% 28%;
+    --warning-foreground: 100 40% 99%;
+    --border: 120 18% 80%;
+    --input: 130 12% 58%;
+    --ring: 150 70% 30%;
+    --brand: 150 70% 30%;
+    --brand-text: 150 70% 22%;
+
+    --radius: 0.125rem;
+    --radius-2xl: 0.25rem;
+    --radius-button: 0.125rem;
+    --font-body: 'Cascadia Code', Consolas, 'Courier New', monospace;
+    --header-band: repeating-linear-gradient(90deg, hsl(150 70% 30%) 0 10px, transparent 10px 14px);
+
+    --shadow-card: 0 1px 0 rgba(12, 49, 32, 0.15);
+    --shadow-soft: 0 0 0 1px rgba(12, 49, 32, 0.12), 0 12px 30px rgba(12, 49, 32, 0.1);
+    --shadow-focus: 0 0 0 3px rgba(18, 122, 71, 0.25);
+    --surface-overlay: rgba(6, 30, 18, 0.45);
+    --page-gradient: repeating-linear-gradient(180deg, #e9f3e4 0 28px, #f8fbf6 28px 56px);
+    --page-glow-1: transparent;
+    --page-glow-2: transparent;
+  }
+
+  [data-skin='terminal'].dark {
+    --background: 140 30% 4%;
+    --foreground: 135 70% 70%;
+    --card: 140 25% 7%;
+    --card-foreground: 135 70% 70%;
+    --popover: 140 25% 7%;
+    --popover-foreground: 135 70% 70%;
+    --primary: 135 75% 50%;
+    --primary-foreground: 140 40% 6%;
+    --secondary: 140 20% 11%;
+    --secondary-foreground: 135 70% 70%;
+    --muted: 140 20% 11%;
+    --muted-foreground: 135 25% 55%;
+    --accent: 140 22% 13%;
+    --accent-foreground: 135 70% 70%;
+    --destructive: 0 85% 62%;
+    --destructive-foreground: 140 40% 6%;
+    --success: 185 75% 50%;
+    --success-foreground: 140 40% 6%;
+    --warning: 45 95% 55%;
+    --warning-foreground: 140 40% 6%;
+    --border: 140 25% 18%;
+    --input: 140 15% 30%;
+    --ring: 135 75% 55%;
+    --brand: 135 75% 50%;
+    --brand-text: 135 80% 60%;
+
+    --header-band: repeating-linear-gradient(90deg, hsl(135 75% 50%) 0 10px, transparent 10px 14px);
+
+    --shadow-card: 0 0 0 1px rgba(80, 220, 120, 0.12), 0 8px 24px rgba(0, 0, 0, 0.6);
+    --shadow-soft: 0 0 0 1px rgba(80, 220, 120, 0.1), 0 16px 40px rgba(0, 0, 0, 0.6);
+    --shadow-focus: 0 0 0 3px rgba(80, 220, 120, 0.35);
+    --surface-overlay: rgba(0, 0, 0, 0.7);
+    /* Lignes de balayage d'un écran cathodique. */
+    --page-gradient:
+      repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+      linear-gradient(180deg, #08110b 0%, #050b07 100%);
+    --page-glow-1: rgba(80, 220, 120, 0.06);
+    --page-glow-2: transparent;
+  }
+
+  /* Journal : papier journal et encre noire, accent rouge, filets plutôt qu'ombres. */
+  [data-skin='journal'] {
+    --background: 40 25% 94%;
+    --foreground: 0 0% 8%;
+    --card: 40 30% 98%;
+    --card-foreground: 0 0% 8%;
+    --popover: 40 30% 98%;
+    --popover-foreground: 0 0% 8%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 40 30% 98%;
+    --secondary: 40 15% 88%;
+    --secondary-foreground: 0 0% 8%;
+    --muted: 40 15% 88%;
+    --muted-foreground: 30 6% 32%;
+    --accent: 40 20% 89%;
+    --accent-foreground: 0 0% 8%;
+    --destructive: 357 75% 38%;
+    --destructive-foreground: 40 30% 98%;
+    --success: 145 55% 25%;
+    --success-foreground: 40 30% 98%;
+    --warning: 32 85% 30%;
+    --warning-foreground: 40 30% 98%;
+    --border: 30 8% 75%;
+    --input: 30 6% 55%;
+    --ring: 357 75% 42%;
+    --brand: 357 75% 42%;
+    --brand-text: 357 75% 36%;
+
+    --radius: 0.125rem;
+    --radius-2xl: 0.25rem;
+    --radius-button: 0.125rem;
+    --font-body: Georgia, Cambria, 'Times New Roman', serif;
+    /* Filet fin puis filet épais, comme sous le titre d'un quotidien. */
+    --header-band: linear-gradient(180deg, hsl(0 0% 8%) 0 1px, transparent 1px 3px, hsl(0 0% 8%) 3px 100%);
+
+    --shadow-card: 0 1px 0 rgba(20, 20, 20, 0.18);
+    --shadow-soft: 0 0 0 1px rgba(20, 20, 20, 0.12), 0 10px 30px rgba(20, 20, 20, 0.12);
+    --shadow-focus: 0 0 0 3px rgba(168, 21, 28, 0.25);
+    --surface-overlay: rgba(20, 20, 20, 0.5);
+    --page-gradient: linear-gradient(180deg, #f4f1ea 0%, #efebe2 100%);
+    --page-glow-1: transparent;
+    --page-glow-2: transparent;
+  }
+
+  [data-skin='journal'].dark {
+    --background: 30 5% 8%;
+    --foreground: 40 25% 90%;
+    --card: 30 5% 11%;
+    --card-foreground: 40 25% 90%;
+    --popover: 30 5% 11%;
+    --popover-foreground: 40 25% 90%;
+    --primary: 40 25% 92%;
+    --primary-foreground: 0 0% 8%;
+    --secondary: 30 5% 16%;
+    --secondary-foreground: 40 25% 90%;
+    --muted: 30 5% 16%;
+    --muted-foreground: 35 10% 66%;
+    --accent: 30 6% 18%;
+    --accent-foreground: 40 25% 90%;
+    --destructive: 357 85% 66%;
+    --destructive-foreground: 0 0% 8%;
+    --success: 145 50% 55%;
+    --success-foreground: 0 0% 8%;
+    --warning: 38 90% 60%;
+    --warning-foreground: 0 0% 8%;
+    --border: 30 5% 24%;
+    --input: 30 4% 38%;
+    --ring: 357 85% 66%;
+    --brand: 357 85% 62%;
+    --brand-text: 357 90% 72%;
+
+    --header-band: linear-gradient(180deg, hsl(40 25% 90%) 0 1px, transparent 1px 3px, hsl(40 25% 90%) 3px 100%);
+
+    --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.5);
+    --shadow-soft: 0 0 0 1px rgba(236, 232, 223, 0.08), 0 16px 40px rgba(0, 0, 0, 0.55);
+    --shadow-focus: 0 0 0 3px rgba(240, 100, 105, 0.35);
+    --surface-overlay: rgba(0, 0, 0, 0.6);
+    --page-gradient: linear-gradient(180deg, #151413 0%, #121110 100%);
+    --page-glow-1: transparent;
+    --page-glow-2: transparent;
+  }
+
+  /* Glacier : bleus froids, lumière et transparence, grands arrondis. */
+  [data-skin='glacier'] {
+    --background: 210 40% 97%;
+    --foreground: 215 40% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 40% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 40% 13%;
+    --primary: 221 72% 46%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 212 30% 93%;
+    --secondary-foreground: 215 40% 13%;
+    --muted: 212 30% 93%;
+    --muted-foreground: 215 16% 38%;
+    --accent: 210 60% 95%;
+    --accent-foreground: 215 40% 13%;
+    --destructive: 352 70% 44%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 165 70% 26%;
+    --success-foreground: 0 0% 100%;
+    --warning: 33 90% 32%;
+    --warning-foreground: 0 0% 100%;
+    --border: 212 25% 86%;
+    --input: 213 18% 68%;
+    --ring: 221 85% 56%;
+    --brand: 199 90% 45%;
+    --brand-text: 205 85% 34%;
+
+    --radius: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-button: 9999px;
+    --font-body: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+    /* Aurore : bleu, violet, turquoise. */
+    --header-band: linear-gradient(90deg, hsl(199 90% 55%), hsl(250 75% 65%) 50%, hsl(175 75% 50%));
+
+    --shadow-card: 0 12px 30px rgba(15, 35, 70, 0.08);
+    --shadow-soft: 0 24px 60px rgba(15, 35, 70, 0.1);
+    --shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    --surface-overlay: rgba(15, 35, 70, 0.35);
+    --page-gradient: linear-gradient(180deg, #f3f7fc 0%, #eef3f9 50%, #f7faff 100%);
+    --page-glow-1: rgba(56, 189, 248, 0.12);
+    --page-glow-2: rgba(139, 92, 246, 0.1);
+  }
+
+  [data-skin='glacier'].dark {
+    --background: 222 40% 8%;
+    --foreground: 210 40% 94%;
+    --card: 222 32% 12%;
+    --card-foreground: 210 40% 94%;
+    --popover: 222 32% 12%;
+    --popover-foreground: 210 40% 94%;
+    --primary: 213 94% 68%;
+    --primary-foreground: 222 47% 10%;
+    --secondary: 220 25% 17%;
+    --secondary-foreground: 210 40% 94%;
+    --muted: 220 25% 17%;
+    --muted-foreground: 215 20% 68%;
+    --accent: 220 28% 19%;
+    --accent-foreground: 210 40% 94%;
+    --destructive: 352 85% 68%;
+    --destructive-foreground: 222 47% 10%;
+    --success: 160 60% 52%;
+    --success-foreground: 222 47% 10%;
+    --warning: 38 92% 62%;
+    --warning-foreground: 222 47% 10%;
+    --border: 220 22% 22%;
+    --input: 218 15% 36%;
+    --ring: 213 94% 68%;
+    --brand: 199 90% 60%;
+    --brand-text: 199 90% 68%;
+
+    --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.4);
+    --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.5);
+    --shadow-focus: 0 0 0 3px rgba(96, 165, 250, 0.35);
+    --surface-overlay: rgba(2, 6, 23, 0.6);
+    --page-gradient: linear-gradient(180deg, #0a1020 0%, #0c1424 50%, #080d1a 100%);
+    --page-glow-1: rgba(56, 189, 248, 0.12);
+    --page-glow-2: rgba(139, 92, 246, 0.12);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply text-foreground;
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background:
+      radial-gradient(circle at top left, var(--page-glow-1), transparent 28%),
+      radial-gradient(circle at top right, var(--page-glow-2), transparent 24%),
+      var(--page-gradient);
+    background-attachment: fixed;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  code {
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    background: hsl(var(--muted));
+    font-family: 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+  }
+
+  /* Focus visible au clavier, sur tous les contrôles interactifs */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+}
+
+/* Décor sous l'en-tête, propre à chaque habillage (`--header-band`). */
+@utility header-band {
+  background: var(--header-band);
+}
+
+/*
+ * Bascule de thème (ThemeToggle) : le nouveau thème défile par-dessus l'ancien. Sans ces règles,
+ * le navigateur ajouterait son fondu par défaut au défilement.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Respect de la préférence « réduire les animations » du système */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}

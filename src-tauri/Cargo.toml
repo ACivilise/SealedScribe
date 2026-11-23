@@ -1,0 +1,74 @@
+[package]
+name = "meetscribe"
+version = "0.4.2"
+description = "Intelligent meeting recording and transcription desktop application"
+license = "GPL-3.0-or-later"
+authors = ["SealedScribe contributors"]
+edition = "2021"
+rust-version = "1.70"
+
+[build-dependencies]
+tauri-build = { version = "=3.0.0-alpha.4", features = [] }
+
+[dependencies]
+tauri = { version = "=3.0.0-alpha.6", features = ["tray-icon"] }
+# Tauri 3 n'embarque plus de runtime WebView : wry (WebView2 sous Windows) est choisi dans main.rs.
+tauri-runtime-wry = "=3.0.0-alpha.6"
+tauri-plugin-dialog = "=3.0.0-alpha.4"
+tauri-plugin-autostart = "=3.0.0-alpha.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.13", features = ["json", "query", "stream", "multipart"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "2"
+
+# Audio recording
+cpal = "0.18"
+hound = "3.5"
+symphonia = { version = "0.6", features = ["all-codecs", "all-formats"] }
+
+# Storage and crypto
+keyring = { version = "3", features = ["windows-native"] }
+dotenvy = "0.15"
+dirs = "7"
+base64 = "0.23"
+
+# Async utilities
+futures = "0.3"
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+# Transcription locale (whisper.cpp) : vérification et extraction des téléchargements
+sha2 = "0.10.9"
+zip = { version = "9", default-features = false, features = ["deflate"] }
+# Séparation des intervenants (sherpa-onnx) : archive .tar.bz2 (bzip2 en Rust pur)
+bzip2 = "0.6"
+tar = "0.4"
+# Regroupement des voix : empreintes par l'API C de sherpa-onnx, valeurs propres (NME-SC)
+libloading = "0.8"
+nalgebra = "0.33"
+
+# Windows WASAPI loopback capture
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Dxgi",
+    "Win32_Media_Audio",
+    "Win32_System_Com",
+    "Win32_System_Threading",
+    "Win32_Devices_Properties",
+    "Win32_Security",
+    "Win32_System_JobObjects",
+    "Win32_System_Power",
+    "Win32_System_Registry",
+    "Win32_System_SystemInformation",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[[bin]]
+name = "meetscribe"
+path = "src/main.rs"
