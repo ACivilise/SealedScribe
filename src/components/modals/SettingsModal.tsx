@@ -39,6 +39,7 @@ import { useDisclaimerStore } from '../../store/disclaimerStore';
 import type { MessageKey } from '../../i18n';
 import { useThemeStore } from '../../store/themeStore';
 import { useSkinStore } from '../../store/skinStore';
+import { useUpdateStore, type CheckOutcome } from '../../store/updateStore';
 import { isSkin, SKINS, type Skin } from '../../lib/skins';
 import { AVAILABLE_LOCALES, useLocaleStore, useT, type LocalePreference } from '../../i18n';
 import pkg from '../../../package.json';
@@ -135,6 +136,10 @@ const SKIN_TEXTS = {
 export default function SettingsModal({ onClose }: SettingsModalProps) {
   const { theme, setTheme } = useThemeStore();
   const skin = useSkinStore((state) => state.skin);
+  const checkForUpdate = useUpdateStore((state) => state.check);
+  const checkingUpdate = useUpdateStore((state) => state.checking);
+  const availableVersion = useUpdateStore((state) => state.available?.version);
+  const [updateOutcome, setUpdateOutcome] = useState<CheckOutcome | null>(null);
   const setSkin = useSkinStore((state) => state.setSkin);
   const { t, intlLocale, formatDate } = useT();
   const disclaimerAcceptedAt = useDisclaimerStore((state) => state.acceptedAt);
@@ -719,6 +724,25 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                     {t('disclaimer.read')}
                   </Button>
                 </p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={checkingUpdate}
+                    onClick={async () => setUpdateOutcome(await checkForUpdate({ manual: true }))}
+                  >
+                    {checkingUpdate ? t('update.checking') : t('update.check')}
+                  </Button>
+                  {updateOutcome && !checkingUpdate && (
+                    <span role="status" className="text-xs text-muted-foreground">
+                      {updateOutcome === 'upToDate'
+                        ? t('update.upToDate')
+                        : updateOutcome === 'available'
+                          ? t('update.foundInBanner', { version: availableVersion ?? '' })
+                          : t('update.checkFailed')}
+                    </span>
+                  )}
+                </div>
                 {showDisclaimer && <DisclaimerModal onClose={() => setShowDisclaimer(false)} />}
               </section>
             </TabsContent>

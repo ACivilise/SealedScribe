@@ -91,16 +91,23 @@ Branche autre que `main` : demander confirmation avant de continuer.
 
 ### 5. Build
 
-`npm run tauri:build` avec `run_in_background` (un build Rust release dépasse souvent 10 min) ; attendre
-la notification de fin. Le nom de l'installeur suit la version de `tauri.conf.json` :
+L'installeur est signé pour la mise à jour automatique (`bundle.createUpdaterArtifacts`, plugin updater) :
+le build lit le chemin de la clé privée dans la variable d'environnement utilisateur
+`TAURI_SIGNING_PRIVATE_KEY`, réglée une fois pour toutes par l'utilisateur. La clé n'a pas de mot de passe.
+**Ne jamais citer ni lire le fichier de clé** dans une commande (le garde-fou `secret-guard` le refuse, à raison) :
+si le build échoue faute de clé, demander à l'utilisateur de régler la variable puis de relancer Claude Code.
+
+`TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" npm run tauri:build` avec `run_in_background` (un build Rust release
+dépasse souvent 10 min) ; attendre la notification de fin. Le nom de l'installeur suit la version de
+`tauri.conf.json`, et sa signature est écrite à côté :
 
 ```bash
 EXE="src-tauri/target/release/bundle/nsis/SealedScribe_X.Y.Z_x64-setup.exe"
-ls -la "$EXE"
+ls -la "$EXE" "$EXE.sig"
 ```
 
 Échec du build : s'arrêter, montrer l'erreur, ne rien committer.
-**Fait quand** `$EXE` existe et date de ce build.
+**Fait quand** `$EXE` et `$EXE.sig` existent et datent de ce build.
 
 ### 6. Commit et tag
 
@@ -122,12 +129,32 @@ git push origin "$(git branch --show-current)"
 git push origin vX.Y.Z
 NOTES="<scratchpad>/release-notes-X.Y.Z.md"
 sed -n '/^## X\.Y\.Z /,/^## /{/^## /!p}' CHANGELOG.md > "$NOTES"   # points échappés
-GH_TOKEN="$(gh auth token --user ACivilise)" gh release create vX.Y.Z "$EXE" \
+# latest.json : lu par la mise à jour automatique des versions installées (endpoint de tauri.conf.json).
+# La signature (.sig) est publique : c'est la clé privée qui ne doit jamais sortir du poste.
+LATEST="<scratchpad>/latest.json"
+python -I -c "
+import json, sys, datetime
+version, exe, notes, out = sys.argv[1:5]
+json.dump({
+  'version': version,
+  'notes': open(notes, encoding='utf-8').read().strip(),
+  'pub_date': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+  'platforms': {'windows-x86_64': {
+    'signature': open(exe + '.sig', encoding='utf-8').read().strip(),
+    'url': f'https://github.com/ACivilise/SealedScribe/releases/download/v{version}/' + exe.split('/')[-1],
+  }},
+}, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+" X.Y.Z "$EXE" "$NOTES" "$LATEST"
+GH_TOKEN="$(gh auth token --user ACivilise)" gh release create vX.Y.Z "$EXE" "$LATEST" \
   --repo ACivilise/SealedScribe --verify-tag --title "SealedScribe X.Y.Z" --notes-file "$NOTES"
 ```
 
+Ne jamais pousser vers `origin` les tags ou l'historique du remote `archive` (ancien dépôt privé MeetScribe).
+
 `GH_TOKEN` cible le compte perso quel que soit le compte `gh` actif (un compte professionnel est aussi connecté).
-**Fait quand** `gh release view vX.Y.Z --repo ACivilise/SealedScribe --json url,assets` montre l'exe.
+**Fait quand** `gh release view vX.Y.Z --repo ACivilise/SealedScribe --json url,assets` montre l'exe et
+`latest.json`, et que `curl -sL https://github.com/ACivilise/SealedScribe/releases/latest/download/latest.json`
+renvoie la nouvelle version (c'est ce que lisent les applications installées).
 
 ### 8. Rapport
 

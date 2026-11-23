@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useT } from '../i18n';
+import { UpdateBanner } from '../components/common/UpdateBanner';
 
 type TabType = 'recording' | 'recordings' | 'prompts' | 'lexicons';
 
@@ -133,6 +134,8 @@ export default function MainApp() {
             </div>
           </div>
         )}
+
+        <UpdateBanner />
 
         {/* Les contenus restent montés (état préservé) ; seul l'affichage change */}
         <main className="min-h-0 flex-1 overflow-auto">

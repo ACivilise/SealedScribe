@@ -6,6 +6,7 @@ mod error;
 mod services;
 mod commands;
 mod tray;
+mod updates;
 
 use services::{AudioRecordingService, StorageService, TranscriptionService, SummaryService, DiarizationService, ExportService, JobManager, LocalWhisperService};
 use tauri_plugin_autostart::MacosLauncher;
@@ -59,6 +60,7 @@ fn main() {
     tauri::Builder::default()
         .runtime(tauri_runtime_wry::Wry::default())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec![START_MINIMIZED_ARG]),
@@ -113,6 +115,9 @@ fn main() {
             commands::quit_app,
             commands::get_launch_at_startup,
             commands::set_launch_at_startup,
+            // Update commands
+            updates::check_for_update,
+            updates::install_update,
             // Job commands
             commands::list_jobs,
             commands::cancel_job,
