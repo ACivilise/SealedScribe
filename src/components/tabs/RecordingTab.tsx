@@ -440,7 +440,7 @@ export default function RecordingTab() {
             data-tour="record-start"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
-            className="flex h-28 w-28 flex-col items-center justify-center gap-1 rounded-full bg-primary text-primary-foreground shadow-card transition-all duration-200 hover:bg-primary/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="flex h-28 w-28 flex-col items-center justify-center gap-1 rounded-full bg-record text-record-foreground shadow-card transition-all duration-200 hover:bg-record/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <Mic className="h-7 w-7" aria-hidden="true" />
             <span className="text-sm font-semibold">{t('record.start')}</span>
@@ -678,7 +678,7 @@ export default function RecordingTab() {
                 <Button variant="outline" className="flex-1" onClick={() => setConfirmDiscardOpen(true)}>
                   {t('record.discard')}
                 </Button>
-                <Button className="flex-1" onClick={handleSave}>
+                <Button variant="record" className="flex-1" onClick={handleSave}>
                   {t('record.save')}
                 </Button>
               </div>

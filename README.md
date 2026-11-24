@@ -35,8 +35,8 @@ React + Tailwind interface, Rust backend, put together with Tauri 3 (alpha).
 - **Import** of an audio file (WAV, MP3, M4A) and **export** of the summary or the transcript.
 - **Background processing**: a transcription goes on with the window closed, resumes after an
   interruption, keeps the PC awake and can shut it down at the end.
-- French or English interface, four skins (Cassette, Terminal, Newspaper, Glacier) in a light or dark
-  theme, start with Windows, optional Microsoft sign-in.
+- French or English interface, nine skins (Cassette, Classic, Terminal, Newspaper, Glacier, Slate, Neon,
+  Pirate, Monochrome) in a light or dark theme, start with Windows, optional Microsoft sign-in.
 
 Every version is described in the [CHANGELOG](CHANGELOG.md) (in French), also shown in the app
 ("What's new" button in the header).

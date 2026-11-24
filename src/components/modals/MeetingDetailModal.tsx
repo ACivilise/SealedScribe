@@ -879,7 +879,7 @@ export default function MeetingDetailModal({ meeting, onClose, onEditPrompts }: 
                 ? t('common.copied')
                 : t(view === 'summary' ? 'detail.copySummary' : 'detail.copyTranscript')}
             </Button>
-            <Button onClick={handleSaveAs} disabled={isExporting || !hasContent}>
+            <Button variant="record" onClick={handleSaveAs} disabled={isExporting || !hasContent}>
               <Save className="h-4 w-4" />
               {isExporting
                 ? t('common.exporting')

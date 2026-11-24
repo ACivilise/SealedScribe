@@ -1,4 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap')
+/*
+ * Polices des habillages (licence OFL). Le navigateur ne télécharge que celles qui servent ; hors
+ * ligne, chaque `--font-body` retombe sur une police système.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Pirata+One&family=Poppins:wght@400;500;600;700&family=Righteous&display=swap')
 layer(base);
 @import 'tailwindcss';
 @import 'tw-animate-css';
@@ -46,6 +50,9 @@ layer(base);
 
   --color-warning: hsl(var(--warning));
   --color-warning-foreground: hsl(var(--warning-foreground));
+
+  --color-record: hsl(var(--record));
+  --color-record-foreground: hsl(var(--record-foreground));
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -129,6 +136,15 @@ layer(base);
     --font-body: 'DM Sans', 'Segoe UI', Roboto, sans-serif;
     --radius-button: 9999px;
 
+    /*
+     * Valeurs par défaut calculées sur <html> à partir de l'habillage et du mode actifs : un habillage
+     * ne les définit que pour s'en écarter. `--record` : Démarrer et les boutons « Enregistrer… ».
+     * `--font-heading` : titres h1 et h2.
+     */
+    --record: var(--primary);
+    --record-foreground: var(--primary-foreground);
+    --font-heading: var(--font-body);
+
     --shadow-card: 0 12px 30px rgba(46, 34, 26, 0.1);
     --shadow-soft: 0 20px 50px rgba(46, 34, 26, 0.1);
     --shadow-focus: 0 0 0 3px rgba(223, 103, 12, 0.25);
@@ -183,8 +199,10 @@ layer(base);
    * Autres habillages (Paramètres > Général > Apparence), posés par `data-skin` sur <html>.
    * Chacun redéfinit tous les tokens ci-dessus : le bloc `[data-skin='x']` sert au thème clair
    * et porte aussi la police, les arrondis et le décor ; le bloc `[data-skin='x'].dark`, plus
-   * spécifique, sert au thème sombre. Un nouveau token doit être défini dans chaque habillage.
+   * spécifique, sert au thème sombre. Un nouveau token doit être défini dans chaque habillage, sauf
+   * s'il a dans `:root` une valeur tirée d'un autre token (`--record`, `--font-heading`).
    * `--radius-2xl` (cartes, modales) surcharge la valeur par défaut de Tailwind.
+   * Contrastes et présence des deux blocs vérifiés par `src/lib/skins.test.ts`.
    */
 
   /* Terminal : papier listing à bandes vertes (clair), écran à phosphore vert (sombre). */
@@ -433,6 +451,440 @@ layer(base);
     --page-glow-2: rgba(139, 92, 246, 0.12);
   }
 
+  /*
+   * Classique : le premier style de l'app. Blanc, texte bleu nuit, orange franc, boutons en pilule,
+   * simple filet sous l'en-tête ; nuit bleu marine en thème sombre.
+   */
+  [data-skin='classic'] {
+    --background: 0 0% 100%;
+    --foreground: 211 51% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 211 51% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 211 51% 13%;
+    --primary: 17 85% 43%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 13% 95%;
+    --secondary-foreground: 211 51% 13%;
+    --muted: 220 13% 95%;
+    --muted-foreground: 210 10% 43%;
+    --accent: 22 100% 98%;
+    --accent-foreground: 211 51% 13%;
+    --destructive: 6 63% 46%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 150 65% 29%;
+    --success-foreground: 0 0% 100%;
+    --warning: 25 91% 32%;
+    --warning-foreground: 0 0% 100%;
+    --border: 206 9% 85%;
+    --input: 210 7% 72%;
+    --ring: 18 85% 49%;
+    /* Orange vif pour le décor ; le fond des boutons, plus sombre, garde 4,5:1 sous du texte blanc. */
+    --brand: 18 85% 49%;
+    --brand-text: 17 85% 43%;
+
+    --radius: 0.75rem;
+    --radius-button: 9999px;
+    --font-body: 'DM Sans', 'Segoe UI', Roboto, sans-serif;
+    /* Simple filet sous l'en-tête, puis la couleur de la barre d'onglets (clair comme sombre). */
+    --header-band: linear-gradient(180deg, hsl(var(--border)) 0 1px, hsl(var(--card)) 1px);
+
+    --shadow-card: 0 12px 30px rgba(16, 32, 49, 0.08);
+    --shadow-soft: 0 20px 50px rgba(16, 32, 49, 0.08);
+    --shadow-focus: 0 0 0 3px rgba(231, 81, 19, 0.2);
+    --surface-overlay: rgba(16, 32, 49, 0.45);
+    --page-gradient: linear-gradient(180deg, #fff8f4 0%, #f2f3f5 48%, #ffffff 100%);
+    --page-glow-1: rgba(231, 81, 19, 0.08);
+    --page-glow-2: rgba(29, 111, 164, 0.08);
+  }
+
+  [data-skin='classic'].dark {
+    --background: 210 48% 9%;
+    --foreground: 216 25% 92%;
+    --card: 210 42% 14%;
+    --card-foreground: 216 25% 92%;
+    --popover: 210 42% 14%;
+    --popover-foreground: 216 25% 92%;
+    --primary: 17 85% 43%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 211 39% 19%;
+    --secondary-foreground: 216 25% 92%;
+    --muted: 211 39% 19%;
+    --muted-foreground: 211 16% 66%;
+    --accent: 211 39% 19%;
+    --accent-foreground: 216 25% 92%;
+    --destructive: 6 81% 70%;
+    --destructive-foreground: 211 51% 13%;
+    --success: 151 49% 54%;
+    --success-foreground: 210 48% 9%;
+    --warning: 37 86% 62%;
+    --warning-foreground: 211 51% 13%;
+    --border: 213 29% 23%;
+    --input: 208 8% 36%;
+    --ring: 19 85% 61%;
+    --brand: 18 85% 49%;
+    --brand-text: 19 85% 61%;
+
+    --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.4);
+    --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.45);
+    --shadow-focus: 0 0 0 3px rgba(231, 81, 19, 0.35);
+    --surface-overlay: rgba(0, 0, 0, 0.55);
+    --page-gradient: linear-gradient(180deg, #0c1722 0%, #0e1a27 50%, #0a131c 100%);
+    --page-glow-1: rgba(231, 81, 19, 0.16);
+    --page-glow-2: rgba(29, 111, 164, 0.16);
+  }
+
+  /*
+   * Ardoise : bleu ardoise, orange et pervenche, police Poppins, angles peu arrondis. Sombre : nuit
+   * bleu ardoise, boutons pervenche.
+   */
+  [data-skin='slate'] {
+    --background: 220 40% 98%;
+    --foreground: 210 35% 30%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 35% 30%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 35% 30%;
+    --primary: 210 35% 37%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 47% 95%;
+    --secondary-foreground: 210 35% 30%;
+    --muted: 220 47% 95%;
+    --muted-foreground: 205 14% 40%;
+    --accent: 228 77% 94%;
+    --accent-foreground: 210 35% 30%;
+    --destructive: 13 98% 42%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 160 100% 24%;
+    --success-foreground: 0 0% 100%;
+    --warning: 36 90% 29%;
+    --warning-foreground: 0 0% 100%;
+    --border: 206 45% 85%;
+    --input: 210 15% 62%;
+    --ring: 198 68% 32%;
+    --brand: 23 78% 48%;
+    --brand-text: 23 85% 36%;
+
+    --radius: 0.5rem;
+    --radius-2xl: 0.75rem;
+    --radius-button: 0.25rem;
+    --font-body: 'Poppins', 'Segoe UI', Roboto, sans-serif;
+    /* Bleu ardoise, pervenche, orange. */
+    --header-band: linear-gradient(90deg, hsl(210 35% 37%) 0 68%, hsl(228 77% 84%) 68% 86%, hsl(23 78% 48%) 86% 100%);
+
+    --shadow-card: 0 8px 24px rgba(61, 93, 126, 0.08);
+    --shadow-soft: 0 20px 50px rgba(61, 93, 126, 0.1);
+    --shadow-focus: 0 0 0 3px rgba(26, 104, 138, 0.25);
+    --surface-overlay: rgba(37, 56, 76, 0.45);
+    --page-gradient: linear-gradient(180deg, #ffffff 0%, #f6f8fc 55%, #eff2f8 100%);
+    --page-glow-1: rgba(204, 213, 248, 0.45);
+    --page-glow-2: rgba(218, 100, 27, 0.06);
+  }
+
+  [data-skin='slate'].dark {
+    --background: 210 40% 9%;
+    --foreground: 220 40% 93%;
+    --card: 210 35% 13%;
+    --card-foreground: 220 40% 93%;
+    --popover: 210 35% 13%;
+    --popover-foreground: 220 40% 93%;
+    --primary: 228 77% 85%;
+    --primary-foreground: 210 45% 12%;
+    --secondary: 210 30% 18%;
+    --secondary-foreground: 220 40% 93%;
+    --muted: 210 30% 18%;
+    --muted-foreground: 215 20% 68%;
+    --accent: 212 30% 20%;
+    --accent-foreground: 220 40% 93%;
+    --destructive: 10 90% 66%;
+    --destructive-foreground: 210 45% 10%;
+    --success: 158 60% 50%;
+    --success-foreground: 210 45% 10%;
+    --warning: 40 100% 62%;
+    --warning-foreground: 210 45% 10%;
+    --border: 210 28% 24%;
+    --input: 210 15% 40%;
+    --ring: 228 77% 80%;
+    --brand: 23 85% 56%;
+    --brand-text: 25 90% 66%;
+
+    --header-band: linear-gradient(90deg, hsl(228 77% 80%) 0 68%, hsl(210 35% 50%) 68% 86%, hsl(23 85% 56%) 86% 100%);
+
+    --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.4);
+    --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.45);
+    --shadow-focus: 0 0 0 3px rgba(204, 213, 248, 0.35);
+    --surface-overlay: rgba(3, 10, 18, 0.6);
+    --page-gradient: linear-gradient(180deg, #0f1a26 0%, #101d2a 50%, #0b141d 100%);
+    --page-glow-1: rgba(204, 213, 248, 0.08);
+    --page-glow-2: rgba(218, 100, 27, 0.1);
+  }
+
+  /*
+   * Néon : coucher de soleil sur la côte (pêche, rose, orange, violet), titres en police rétro arrondie,
+   * boutons en pilule. Sombre : la même côte la nuit, néons rose et cyan.
+   */
+  [data-skin='neon'] {
+    --background: 25 100% 97%;
+    --foreground: 270 50% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 270 50% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 270 50% 15%;
+    --primary: 330 80% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 300 40% 94%;
+    --secondary-foreground: 270 50% 15%;
+    --muted: 300 40% 94%;
+    --muted-foreground: 285 18% 38%;
+    --accent: 22 100% 92%;
+    --accent-foreground: 270 50% 15%;
+    --destructive: 0 75% 42%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 174 75% 24%;
+    --success-foreground: 0 0% 100%;
+    --warning: 28 95% 32%;
+    --warning-foreground: 0 0% 100%;
+    --border: 310 30% 86%;
+    --input: 295 15% 62%;
+    --ring: 330 85% 52%;
+    --brand: 20 100% 55%;
+    --brand-text: 18 90% 36%;
+
+    --radius: 0.75rem;
+    --radius-2xl: 1.25rem;
+    --radius-button: 9999px;
+    --font-body: 'Montserrat', 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Righteous', 'Montserrat', 'Segoe UI', sans-serif;
+    /* Ciel du couchant : jaune, orange, rose, violet. */
+    --header-band: linear-gradient(90deg, hsl(42 100% 58%), hsl(18 100% 58%) 30%, hsl(332 90% 56%) 62%, hsl(268 75% 55%));
+
+    --shadow-card: 0 12px 30px rgba(150, 30, 100, 0.1);
+    --shadow-soft: 0 24px 60px rgba(150, 30, 100, 0.12);
+    --shadow-focus: 0 0 0 3px rgba(219, 39, 119, 0.25);
+    --surface-overlay: rgba(45, 15, 60, 0.45);
+    --page-gradient: linear-gradient(180deg, #fff4ea 0%, #ffeaf1 55%, #f5ecff 100%);
+    --page-glow-1: rgba(255, 138, 61, 0.16);
+    --page-glow-2: rgba(236, 72, 153, 0.14);
+  }
+
+  [data-skin='neon'].dark {
+    --background: 265 45% 7%;
+    --foreground: 300 30% 94%;
+    --card: 265 38% 11%;
+    --card-foreground: 300 30% 94%;
+    --popover: 265 38% 11%;
+    --popover-foreground: 300 30% 94%;
+    --primary: 328 100% 65%;
+    --primary-foreground: 265 50% 8%;
+    --secondary: 265 30% 16%;
+    --secondary-foreground: 300 30% 94%;
+    --muted: 265 30% 16%;
+    --muted-foreground: 280 20% 70%;
+    --accent: 265 32% 19%;
+    --accent-foreground: 300 30% 94%;
+    --destructive: 0 90% 66%;
+    --destructive-foreground: 265 50% 8%;
+    --success: 170 80% 50%;
+    --success-foreground: 265 50% 8%;
+    --warning: 40 100% 62%;
+    --warning-foreground: 265 50% 8%;
+    --border: 265 30% 22%;
+    --input: 270 20% 38%;
+    --ring: 328 100% 68%;
+    --brand: 185 100% 55%;
+    --brand-text: 185 100% 65%;
+
+    /* Tubes néon : rose, violet, cyan. */
+    --header-band: linear-gradient(90deg, hsl(328 100% 62%), hsl(275 90% 66%) 50%, hsl(185 100% 55%));
+
+    --shadow-card: 0 0 0 1px rgba(255, 77, 171, 0.14), 0 12px 30px rgba(0, 0, 0, 0.5);
+    --shadow-soft: 0 0 0 1px rgba(255, 77, 171, 0.12), 0 24px 60px rgba(0, 0, 0, 0.55);
+    --shadow-focus: 0 0 0 3px rgba(255, 77, 171, 0.4);
+    --surface-overlay: rgba(8, 3, 20, 0.65);
+    --page-gradient: linear-gradient(180deg, #160b2b 0%, #12092a 55%, #0a0618 100%);
+    --page-glow-1: rgba(255, 77, 171, 0.16);
+    --page-glow-2: rgba(34, 211, 238, 0.12);
+  }
+
+  /*
+   * Pirate : parchemin, encre sépia, rouge sang-de-bœuf et or, bande en corde, titres de grimoire.
+   * Sombre : la mer de nuit, texte parchemin, or de lanterne.
+   */
+  [data-skin='pirate'] {
+    --background: 40 45% 88%;
+    --foreground: 25 45% 13%;
+    --card: 42 55% 94%;
+    --card-foreground: 25 45% 13%;
+    --popover: 42 55% 94%;
+    --popover-foreground: 25 45% 13%;
+    --primary: 355 62% 32%;
+    --primary-foreground: 42 55% 95%;
+    --secondary: 38 35% 81%;
+    --secondary-foreground: 25 45% 13%;
+    --muted: 38 35% 81%;
+    --muted-foreground: 28 30% 28%;
+    --accent: 40 50% 80%;
+    --accent-foreground: 25 45% 13%;
+    --destructive: 0 72% 36%;
+    --destructive-foreground: 42 55% 95%;
+    --success: 175 60% 21%;
+    --success-foreground: 42 55% 95%;
+    --warning: 30 85% 26%;
+    --warning-foreground: 42 55% 95%;
+    --border: 33 30% 68%;
+    --input: 30 25% 48%;
+    --ring: 42 80% 38%;
+    --brand: 42 80% 45%;
+    --brand-text: 36 85% 24%;
+
+    --radius: 0.375rem;
+    --radius-2xl: 0.5rem;
+    --radius-button: 0.375rem;
+    --font-body: 'Alegreya', Georgia, 'Times New Roman', serif;
+    --font-heading: 'Pirata One', 'Alegreya', Georgia, serif;
+    /* Corde torsadée : brins bruns et chanvre. */
+    --header-band: repeating-linear-gradient(60deg, hsl(28 40% 28%) 0 3px, hsl(36 48% 55%) 3px 6px);
+
+    --shadow-card: 0 10px 26px rgba(70, 40, 15, 0.14);
+    --shadow-soft: 0 20px 50px rgba(70, 40, 15, 0.16);
+    --shadow-focus: 0 0 0 3px rgba(190, 140, 30, 0.35);
+    --surface-overlay: rgba(40, 22, 8, 0.5);
+    /* Parchemin bruni sur les bords. */
+    --page-gradient:
+      radial-gradient(ellipse at center, transparent 55%, rgba(110, 70, 30, 0.22) 100%),
+      linear-gradient(180deg, #efe3c8 0%, #e9dab8 100%);
+    --page-glow-1: rgba(212, 160, 40, 0.1);
+    --page-glow-2: transparent;
+  }
+
+  [data-skin='pirate'].dark {
+    --background: 215 45% 7%;
+    --foreground: 40 45% 85%;
+    --card: 215 35% 11%;
+    --card-foreground: 40 45% 85%;
+    --popover: 215 35% 11%;
+    --popover-foreground: 40 45% 85%;
+    --primary: 42 85% 55%;
+    --primary-foreground: 215 50% 8%;
+    --secondary: 215 30% 16%;
+    --secondary-foreground: 40 45% 85%;
+    --muted: 215 30% 16%;
+    --muted-foreground: 40 15% 65%;
+    --accent: 215 30% 18%;
+    --accent-foreground: 40 45% 85%;
+    --destructive: 0 80% 64%;
+    --destructive-foreground: 215 50% 8%;
+    --success: 170 55% 50%;
+    --success-foreground: 215 50% 8%;
+    --warning: 38 90% 60%;
+    --warning-foreground: 215 50% 8%;
+    --border: 215 28% 22%;
+    --input: 215 18% 38%;
+    --ring: 42 85% 58%;
+    --brand: 42 85% 55%;
+    --brand-text: 42 90% 65%;
+
+    --header-band: repeating-linear-gradient(60deg, hsl(30 30% 16%) 0 3px, hsl(34 32% 38%) 3px 6px);
+
+    --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.5);
+    --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.55);
+    --shadow-focus: 0 0 0 3px rgba(240, 180, 60, 0.35);
+    --surface-overlay: rgba(2, 6, 14, 0.65);
+    --page-gradient: linear-gradient(180deg, #0c1624 0%, #0a1320 60%, #070d17 100%);
+    /* Clair de lune à gauche, lanterne à droite. */
+    --page-glow-1: rgba(235, 225, 190, 0.06);
+    --page-glow-2: rgba(240, 170, 60, 0.08);
+  }
+
+  /*
+   * Monochrome : noir et blanc, sans décor. Seuls Démarrer, les boutons « Enregistrer… » (`--record`)
+   * et les actions destructives sont en rouge.
+   */
+  [data-skin='monochrome'] {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 7%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 38%;
+    --accent: 0 0% 94%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 78% 44%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 0 0% 20%;
+    --success-foreground: 0 0% 100%;
+    --warning: 0 0% 32%;
+    --warning-foreground: 0 0% 100%;
+    --border: 0 0% 85%;
+    --input: 0 0% 60%;
+    --ring: 0 0% 9%;
+    --brand: 0 0% 9%;
+    --brand-text: 0 0% 9%;
+    --record: 0 78% 44%;
+    --record-foreground: 0 0% 100%;
+
+    --radius: 0.25rem;
+    --radius-2xl: 0.375rem;
+    --radius-button: 0.25rem;
+    --font-body: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    /* Filet noir de 2 px, puis la couleur de la barre d'onglets. */
+    --header-band: linear-gradient(180deg, hsl(0 0% 9%) 0 2px, hsl(var(--card)) 2px);
+
+    --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.08);
+    --shadow-soft: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 12px 30px rgba(0, 0, 0, 0.08);
+    --shadow-focus: 0 0 0 3px rgba(0, 0, 0, 0.2);
+    --surface-overlay: rgba(0, 0, 0, 0.5);
+    --page-gradient: linear-gradient(180deg, #ffffff 0%, #ffffff 100%);
+    --page-glow-1: transparent;
+    --page-glow-2: transparent;
+  }
+
+  [data-skin='monochrome'].dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 6%;
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 95%;
+    --destructive: 0 85% 64%;
+    --destructive-foreground: 0 0% 6%;
+    --success: 0 0% 80%;
+    --success-foreground: 0 0% 6%;
+    --warning: 0 0% 70%;
+    --warning-foreground: 0 0% 6%;
+    --border: 0 0% 20%;
+    --input: 0 0% 36%;
+    --ring: 0 0% 90%;
+    --brand: 0 0% 96%;
+    --brand-text: 0 0% 96%;
+    --record: 0 75% 52%;
+    --record-foreground: 0 0% 100%;
+
+    --header-band: linear-gradient(180deg, hsl(0 0% 92%) 0 2px, hsl(var(--card)) 2px);
+
+    --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.06);
+    --shadow-soft: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 16px 40px rgba(0, 0, 0, 0.6);
+    --shadow-focus: 0 0 0 3px rgba(255, 255, 255, 0.25);
+    --surface-overlay: rgba(0, 0, 0, 0.7);
+    --page-gradient: linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 100%);
+    --page-glow-1: transparent;
+    --page-glow-2: transparent;
+  }
+
   * {
     @apply border-border;
   }
@@ -450,6 +902,16 @@ layer(base);
       radial-gradient(circle at top right, var(--page-glow-2), transparent 24%),
       var(--page-gradient);
     background-attachment: fixed;
+  }
+
+  /*
+   * Titres (nom de l'app, titres des cartes et des modales). Les polices de titre de Pirate et Néon
+   * n'ont qu'une graisse : pas de faux gras.
+   */
+  h1,
+  h2 {
+    font-family: var(--font-heading);
+    font-synthesis: none;
   }
 
   html {

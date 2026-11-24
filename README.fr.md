@@ -37,8 +37,9 @@ Interface React + Tailwind, backend Rust, le tout assemblé par Tauri 3 (version
 - **Import** d’un audio (WAV, MP3, M4A) et **export** du résumé ou de la transcription.
 - **Traitements en arrière-plan** : une transcription continue fenêtre fermée, reprend après une
   interruption, garde le PC éveillé et peut l’éteindre à la fin.
-- Interface en français ou en anglais, quatre habillages (Cassette, Terminal, Journal, Glacier) en
-  thème clair ou sombre, lancement au démarrage de Windows, connexion Microsoft facultative.
+- Interface en français ou en anglais, neuf habillages (Cassette, Classique, Terminal, Journal, Glacier,
+  Ardoise, Néon, Pirate, Monochrome) en thème clair ou sombre, lancement au démarrage de Windows,
+  connexion Microsoft facultative.
 
 Le détail de chaque version est dans le [CHANGELOG](CHANGELOG.md), aussi affiché dans l’application
 (bouton « Nouveautés » de l’en-tête).

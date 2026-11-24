@@ -29,8 +29,18 @@ describe('skinStore', () => {
 });
 
 describe('isSkin', () => {
-  it('reconnaît les quatre habillages et rien d’autre', () => {
-    expect(SKINS).toEqual(['cassette', 'terminal', 'journal', 'glacier']);
+  it('reconnaît les neuf habillages et rien d’autre', () => {
+    expect(SKINS).toEqual([
+      'cassette',
+      'classic',
+      'terminal',
+      'journal',
+      'glacier',
+      'slate',
+      'neon',
+      'pirate',
+      'monochrome',
+    ]);
     expect(SKINS.every(isSkin)).toBe(true);
     expect(isSkin('dark')).toBe(false);
     expect(isSkin(undefined)).toBe(false);

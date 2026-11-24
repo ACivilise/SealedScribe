@@ -9,6 +9,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        // Démarrer / enregistrer : couleur `--record`, celle de `primary` sauf dans Monochrome (rouge).
+        record: 'bg-record text-record-foreground hover:bg-record/90',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline: 'border border-input bg-card text-foreground hover:border-foreground/40 hover:bg-accent',
         secondary: 'border border-input bg-card text-foreground hover:border-foreground/40 hover:bg-accent',

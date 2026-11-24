@@ -132,6 +132,11 @@ const SKIN_TEXTS = {
   terminal: { name: 'settings.skinTerminal', hint: 'settings.skinTerminalHint' },
   journal: { name: 'settings.skinJournal', hint: 'settings.skinJournalHint' },
   glacier: { name: 'settings.skinGlacier', hint: 'settings.skinGlacierHint' },
+  classic: { name: 'settings.skinClassic', hint: 'settings.skinClassicHint' },
+  slate: { name: 'settings.skinSlate', hint: 'settings.skinSlateHint' },
+  neon: { name: 'settings.skinNeon', hint: 'settings.skinNeonHint' },
+  pirate: { name: 'settings.skinPirate', hint: 'settings.skinPirateHint' },
+  monochrome: { name: 'settings.skinMonochrome', hint: 'settings.skinMonochromeHint' },
 } as const satisfies Record<Skin, { name: MessageKey; hint: MessageKey }>;
 
 export default function SettingsModal({ onClose }: SettingsModalProps) {
@@ -1187,6 +1192,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
               {t('common.cancel')}
             </Button>
             <Button
+              variant="record"
               onClick={handleSave}
               disabled={isSaving || !isDirty || !preferences || clientIdInvalid || tenantIdInvalid}
             >
