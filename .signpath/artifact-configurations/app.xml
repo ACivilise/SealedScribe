@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SignPath, configuration « app » : l'exe de l'application, envoyé seul dans une archive ZIP par
+  .github/workflows/release.yml (étape « Envoyer l'exe à signer »). Le nom et la version du produit
+  inscrits dans l'exe doivent correspondre, sinon SignPath refuse de signer.
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" required="true" />
+  </parameters>
+  <zip-file>
+    <pe-file path="meetscribe.exe" product-name="SealedScribe" product-version="${version}">
+      <authenticode-sign />
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

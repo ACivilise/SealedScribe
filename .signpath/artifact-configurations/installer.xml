@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SignPath, configuration « installer » : l'installeur NSIS, construit autour de l'exe déjà signé et
+  envoyé seul dans une archive ZIP par .github/workflows/release.yml. Un installeur NSIS est un
+  exécutable Windows ordinaire (PE) : SignPath le signe sans toucher à son contenu.
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" required="true" />
+  </parameters>
+  <zip-file>
+    <pe-file path="SealedScribe_${version}_x64-setup.exe" product-name="SealedScribe" product-version="${version}">
+      <authenticode-sign />
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

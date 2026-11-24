@@ -1,16 +1,21 @@
 ---
 name: release
-description: Publie une version de SealedScribe. Met à jour CHANGELOG.md (affiché dans « Nouveautés »), monte la version, construit l'installeur NSIS et le pousse en GitHub Release. À utiliser pour « release », « publier une version », « mettre à jour le changelog », « builder l'installeur », « pousser l'exe sur GitHub ». Argument facultatif : la version (ex. `0.2.0`).
+description: Publie une version de SealedScribe. Met à jour CHANGELOG.md (affiché dans « Nouveautés »), monte la version, pousse le tag ; le workflow GitHub Actions construit l'installeur NSIS, le fait signer par SignPath et publie la GitHub Release. À utiliser pour « release », « publier une version », « mettre à jour le changelog », « builder l'installeur », « pousser l'exe sur GitHub ». Argument facultatif : la version (ex. `0.2.0`).
 ---
 
 # Release SealedScribe
 
-Une release = une section du `CHANGELOG.md` + la même version dans trois fichiers + un tag `vX.Y.Z`
-+ une GitHub Release (dépôt public `ACivilise/SealedScribe`) portant l'installeur NSIS.
+Une release = une section du `CHANGELOG.md` + la même version dans les fichiers de version + un tag
+`vX.Y.Z`. Le tag poussé lance `.github/workflows/release.yml`, qui construit l'installeur NSIS sur une
+machine Windows de GitHub, le fait signer par SignPath Foundation (quand c'est configuré, voir
+`.signpath/README.md`), le signe pour la mise à jour automatique et publie la GitHub Release (dépôt
+public `ACivilise/SealedScribe`) avec `latest.json`.
 `src/lib/releaseNotes.test.ts` est la **garde** : il échoue si le changelog sort du format ou si sa
 dernière version diffère de celle des fichiers de version.
 
 Commandes en Git Bash (pas de script PowerShell). Le commit et le tag sont au seul nom de l'utilisateur.
+`gh` vise le compte perso avec `GH_TOKEN="$(gh auth token --user ACivilise)"` (un compte professionnel est
+aussi connecté).
 
 ---
 
@@ -79,8 +84,12 @@ Branche autre que `main` : demander confirmation avant de continuer.
 - Écrire la section `## X.Y.Z — $(date +%F)` en tête de `CHANGELOG.md`, sous le commentaire d'en-tête,
   en suivant le format et le style ci-dessus. Section déjà présente (préparée à l'avance, pas encore
   taguée) : la compléter avec les commits qu'elle ne couvre pas et mettre sa date à jour.
-- Mettre `X.Y.Z` dans `package.json`, `src-tauri/tauri.conf.json` et `src-tauri/Cargo.toml`
-  (champ `version` du paquet, ligne 3 de chacun). `Cargo.lock` et `package-lock.json` sont ignorés par git.
+- Mettre `X.Y.Z` partout, fichiers de verrouillage compris (le CI construit avec `--locked`) :
+  ```bash
+  npm version X.Y.Z --no-git-tag-version          # package.json et package-lock.json
+  # puis le champ `version` (ligne 3) de src-tauri/tauri.conf.json et src-tauri/Cargo.toml
+  cargo update --workspace --offline --manifest-path src-tauri/Cargo.toml   # Cargo.lock
+  ```
 - Montrer la section à l'utilisateur.
 
 **Fait quand** chaque commit `feat` / `fix` de la plage est couvert par une puce ou délibérément écarté.
@@ -89,44 +98,72 @@ Branche autre que `main` : demander confirmation avant de continuer.
 
 `npm test` puis `npx tsc --noEmit`. **Fait quand** les deux passent (la garde valide format et versions).
 
-### 5. Build
-
-L'installeur est signé pour la mise à jour automatique (`bundle.createUpdaterArtifacts`, plugin updater) :
-le build lit le chemin de la clé privée dans la variable d'environnement utilisateur
-`TAURI_SIGNING_PRIVATE_KEY`, réglée une fois pour toutes par l'utilisateur. La clé n'a pas de mot de passe.
-**Ne jamais citer ni lire le fichier de clé** dans une commande (le garde-fou `secret-guard` le refuse, à raison) :
-si le build échoue faute de clé, demander à l'utilisateur de régler la variable puis de relancer Claude Code.
-
-`TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" npm run tauri:build` avec `run_in_background` (un build Rust release
-dépasse souvent 10 min) ; attendre la notification de fin. Le nom de l'installeur suit la version de
-`tauri.conf.json`, et sa signature est écrite à côté :
+### 5. Commit et tag
 
 ```bash
-EXE="src-tauri/target/release/bundle/nsis/SealedScribe_X.Y.Z_x64-setup.exe"
-ls -la "$EXE" "$EXE.sig"
-```
-
-Échec du build : s'arrêter, montrer l'erreur, ne rien committer.
-**Fait quand** `$EXE` et `$EXE.sig` existent et datent de ce build.
-
-### 6. Commit et tag
-
-```bash
-git add CHANGELOG.md package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml
+git add CHANGELOG.md package.json package-lock.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Cargo.lock
 git commit -m "chore(release): vX.Y.Z"
 git tag -a vX.Y.Z -m "SealedScribe X.Y.Z"
 ```
 
 Le message de commit tient en cette seule ligne.
 
-### 7. Publication
+### 6. Publication
 
-Action visible hors du poste : obtenir d'abord une confirmation explicite (version, branche, chemin et
-taille de l'exe, notes). Puis :
+Action visible hors du poste : obtenir d'abord une confirmation explicite (version, branche, notes, et si
+la signature SignPath est active : les deux demandes à approuver). Vérifier avant :
+
+```bash
+export GH_TOKEN="$(gh auth token --user ACivilise)"
+gh secret list --repo ACivilise/SealedScribe        # TAURI_SIGNING_PRIVATE_KEY obligatoire
+gh variable list --repo ACivilise/SealedScribe      # SIGNPATH_ORGANIZATION_ID : signature Windows active
+```
+
+Sans le secret `TAURI_SIGNING_PRIVATE_KEY`, le workflow échoue sur un tag : passer par le secours
+ci-dessous ou demander à l'utilisateur d'ajouter le secret. Puis :
 
 ```bash
 git push origin "$(git branch --show-current)"
 git push origin vX.Y.Z
+gh run list --repo ACivilise/SealedScribe --workflow release.yml --limit 1   # id du run du tag
+gh run watch <id> --repo ACivilise/SealedScribe --exit-status                 # avec run_in_background
+```
+
+Le build prend 20 à 40 min. Signature SignPath active : le run attend deux approbations sur
+[app.signpath.io](https://app.signpath.io), l'exe puis l'installeur (une heure au plus chacune) ;
+prévenir l'utilisateur quand le run atteint « Signer l'exe (SignPath) ».
+
+Ne jamais pousser vers `origin` les tags ou l'historique du remote `archive` (ancien dépôt privé MeetScribe).
+
+Échec du run : montrer l'étape en échec (`gh run view <id> --log-failed`), corriger, puis relancer le run
+(`gh run rerun <id>`) ; ne pas déplacer un tag déjà publié.
+**Fait quand** `gh release view vX.Y.Z --repo ACivilise/SealedScribe --json url,assets` montre l'exe et
+`latest.json`, et que `curl -sL https://github.com/ACivilise/SealedScribe/releases/latest/download/latest.json`
+renvoie la nouvelle version (c'est ce que lisent les applications installées).
+
+### 7. Rapport
+
+URL de la release, version et taille de l'installeur (dépôt public : téléchargeable sans compte GitHub),
+installeur signé par SignPath ou non.
+
+---
+
+## Secours : release construite sur le poste
+
+Si GitHub Actions est indisponible. L'installeur n'a alors pas de signature Windows.
+
+Le build signe pour la mise à jour avec la clé dont le chemin est dans la variable d'environnement
+utilisateur `TAURI_SIGNING_PRIVATE_KEY` (sans mot de passe). **Ne jamais citer ni lire le fichier de clé**
+dans une commande (le garde-fou `secret-guard` le refuse, à raison).
+
+Après le commit et le tag (étape 5), `TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" npm run tauri:build` avec
+`run_in_background`, **avant** de pousser quoi que ce soit. Puis, d'un seul enchaînement : pousser `main`
+et le tag, publier à la main, et annuler le run du workflow que le tag a lancé s'il tourne
+(`gh run cancel <id>`). Laissé seul, il échouerait de toute façon sur la release déjà publiée.
+
+```bash
+EXE="src-tauri/target/release/bundle/nsis/SealedScribe_X.Y.Z_x64-setup.exe"
+ls -la "$EXE" "$EXE.sig"                       # tous deux datés de ce build
 NOTES="<scratchpad>/release-notes-X.Y.Z.md"
 sed -n '/^## X\.Y\.Z /,/^## /{/^## /!p}' CHANGELOG.md > "$NOTES"   # points échappés
 # latest.json : lu par la mise à jour automatique des versions installées (endpoint de tauri.conf.json).
@@ -145,17 +182,8 @@ json.dump({
   }},
 }, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 " X.Y.Z "$EXE" "$NOTES" "$LATEST"
+git push origin "$(git branch --show-current)"
+git push origin vX.Y.Z
 GH_TOKEN="$(gh auth token --user ACivilise)" gh release create vX.Y.Z "$EXE" "$LATEST" \
   --repo ACivilise/SealedScribe --verify-tag --title "SealedScribe X.Y.Z" --notes-file "$NOTES"
 ```
-
-Ne jamais pousser vers `origin` les tags ou l'historique du remote `archive` (ancien dépôt privé MeetScribe).
-
-`GH_TOKEN` cible le compte perso quel que soit le compte `gh` actif (un compte professionnel est aussi connecté).
-**Fait quand** `gh release view vX.Y.Z --repo ACivilise/SealedScribe --json url,assets` montre l'exe et
-`latest.json`, et que `curl -sL https://github.com/ACivilise/SealedScribe/releases/latest/download/latest.json`
-renvoie la nouvelle version (c'est ce que lisent les applications installées).
-
-### 8. Rapport
-
-URL de la release, version et taille de l'installeur (dépôt public : téléchargeable sans compte GitHub).

@@ -4,11 +4,11 @@
 .env.*.local
 
 # Dependencies
+# package-lock.json et src-tauri/Cargo.lock sont versionnés : le build de release dans GitHub Actions
+# doit être reproductible (exigence de la signature SignPath Foundation).
 node_modules/
 pnpm-lock.yaml
 yarn.lock
-package-lock.json
-*.lock
 
 # Build outputs
 dist/
@@ -22,12 +22,10 @@ build/
 
 # Tauri
 src-tauri/target/
-src-tauri/Cargo.lock
 libexec/
 
 # Rust
 target/
-Cargo.lock
 *.rs.bk
 *.pdb
 

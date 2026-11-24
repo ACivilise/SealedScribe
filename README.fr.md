@@ -48,8 +48,10 @@ Le détail de chaque version est dans le [CHANGELOG](CHANGELOG.md), aussi affich
 
 L’installeur `SealedScribe_X.Y.Z_x64-setup.exe` est publié dans les
 [GitHub Releases](https://github.com/ACivilise/SealedScribe/releases) du dépôt.
-Il n’est pas signé : au premier lancement, Windows SmartScreen affiche un avertissement
-(« Informations complémentaires » puis « Exécuter quand même »).
+Il n’a pas encore de signature Windows (voir [Politique de signature du code](#politique-de-signature-du-code-code-signing-policy)) :
+au premier lancement, Windows SmartScreen affiche un avertissement (« Informations complémentaires » puis
+« Exécuter quand même »). Les versions installées se mettent à jour seules : un bandeau propose chaque
+nouvelle version, et n’installe qu’une mise à jour signée avec la clé de mise à jour du projet.
 
 Prérequis :
 
@@ -61,6 +63,27 @@ Prérequis :
   résumé) ;
 - pour le résumé sur le PC : Ollama (ou LM Studio, llama-server) avec un modèle déjà installé,
   par exemple `ollama pull qwen3:4b`. SealedScribe ne télécharge pas ces modèles.
+
+## Politique de signature du code (Code signing policy)
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+> [!NOTE]
+> La signature par SignPath Foundation est en cours de mise en place : d’ici là, les installeurs sont
+> publiés sans signature Windows.
+
+- **Ce qui est signé :** uniquement les fichiers construits à partir du code de ce dépôt, l’application
+  (`meetscribe.exe`) et son installeur. Les moteurs de transcription et de séparation des voix et les
+  modèles que l’app télécharge à la demande (whisper.cpp, sherpa-onnx, modèles hébergés sur Hugging Face)
+  viennent de leurs propres projets et ne sont pas signés par SealedScribe.
+- **Comment :** chaque version est construite à partir d’un tag par le
+  [workflow Release](.github/workflows/release.yml), sur les machines de GitHub, puis signée par
+  SignPath. Chaque demande de signature est approuvée à la main.
+- **Équipe et rôles :**
+  - Committers and reviewers : [ACivilise](https://github.com/ACivilise)
+  - Approvers : [ACivilise](https://github.com/ACivilise)
+- **Confidentialité :** SealedScribe n’a pas de télémétrie et n’envoie rien à son auteur. Tout ce qu’elle
+  envoie, où et quand, est listé dans [Où vont vos données](#où-vont-vos-données).
 
 ## Configuration
 
@@ -118,6 +141,7 @@ Tout se règle dans la fenêtre **Paramètres**, et rien n’est obligatoire pou
 | Mistral AI (`api.mistral.ai`) | L’audio et les termes des lexiques ; la transcription et le prompt | Moteur de transcription Mistral ; résumé avec Mistral AI |
 | Microsoft Entra ID (`login.microsoftonline.com`) | Votre identité | Connexion Microsoft activée |
 | GitHub et Hugging Face | Rien (téléchargement, vérifié par empreinte SHA-256) | Installation du moteur local |
+| GitHub (`github.com`) | Rien (vérification de version ; téléchargement de l’installeur si vous acceptez la mise à jour) | Recherche de mise à jour : 15 secondes après le lancement, puis toutes les 6 heures, et « Rechercher une mise à jour » |
 | Google Fonts | Rien (téléchargement de la police) | Affichage de l’interface |
 
 Avec le moteur de transcription local et un résumé local (ou sans résumé), ni l’audio ni le texte des
@@ -160,8 +184,10 @@ SPECIFICATIONS.md       Spécifications fonctionnelles
 
 `CHANGELOG.md` suit un format strict, vérifié par `src/lib/releaseNotes.test.ts`, qui exige aussi que sa
 dernière version soit celle de `package.json`, `src-tauri/tauri.conf.json` et `src-tauri/Cargo.toml`.
-La publication d’une version (changelog, numéro de version, installeur, GitHub Release) se fait avec la
-skill Claude Code `/release`.
+Une version se prépare avec la skill Claude Code `/release` (changelog, numéro de version, tag) ; le tag
+poussé lance le [workflow Release](.github/workflows/release.yml), qui construit et signe l’installeur et
+publie la GitHub Release avec le fichier `latest.json` lu par la mise à jour automatique
+([`.signpath/`](.signpath/README.md) décrit la mise en place de la signature).
 
 ## Licence
 

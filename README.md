@@ -45,7 +45,9 @@ Every version is described in the [CHANGELOG](CHANGELOG.md) (in French), also sh
 
 The `SealedScribe_X.Y.Z_x64-setup.exe` installer is published in the repository's
 [GitHub Releases](https://github.com/ACivilise/SealedScribe/releases).
-It is not signed: on first launch, Windows SmartScreen shows a warning ("More info", then "Run anyway").
+It is not code signed yet (see [Code signing policy](#code-signing-policy)): on first launch, Windows
+SmartScreen shows a warning ("More info", then "Run anyway"). Installed versions update themselves: a
+banner offers each new version, and only installs an update signed with the project's update key.
 
 Requirements:
 
@@ -56,6 +58,26 @@ Requirements:
 - for Mistral AI: an API key created on `console.mistral.ai` (one key for both transcription and summary);
 - for summaries on the PC: Ollama (or LM Studio, llama-server) with a model already installed, for example
   `ollama pull qwen3:4b`. SealedScribe does not download these models.
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+> [!NOTE]
+> Code signing through SignPath Foundation is being set up: until it is in place, the installers are
+> published without a Windows code signature.
+
+- **What is signed:** only files built from this repository's source code, the application
+  (`meetscribe.exe`) and its installer. The transcription and speaker-separation engines and models that
+  the app downloads on request (whisper.cpp, sherpa-onnx, models hosted on Hugging Face) come from their
+  own projects and are not signed by SealedScribe.
+- **How:** each release is built from a version tag by the [Release workflow](.github/workflows/release.yml)
+  on GitHub-hosted runners, then signed through SignPath. Every signing request is approved manually.
+- **Team and roles:**
+  - Committers and reviewers: [ACivilise](https://github.com/ACivilise)
+  - Approvers: [ACivilise](https://github.com/ACivilise)
+- **Privacy:** SealedScribe has no telemetry and sends nothing to its author. Everything it sends, where
+  and when, is listed in [Where your data goes](#where-your-data-goes).
 
 ## Configuration
 
@@ -111,6 +133,7 @@ name, so that existing data is kept:
 | Mistral AI (`api.mistral.ai`) | The audio and the vocabulary list terms; the transcript and the prompt | Mistral transcription engine; summary with Mistral AI |
 | Microsoft Entra ID (`login.microsoftonline.com`) | Your identity | Microsoft sign-in turned on |
 | GitHub and Hugging Face | Nothing (download, checked by SHA-256 hash) | Local engine installation |
+| GitHub (`github.com`) | Nothing (version check; installer download when you accept the update) | Update check: 15 seconds after launch, then every 6 hours, and "Check for updates" |
 | Google Fonts | Nothing (font download) | Displaying the interface |
 
 With the local transcription engine and a local summary (or no summary), neither the audio nor the text of
@@ -155,8 +178,10 @@ SPECIFICATIONS.md       Functional specifications
 
 `CHANGELOG.md` follows a strict format, checked by `src/lib/releaseNotes.test.ts`, which also requires its
 latest version to match the one in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`.
-A release (changelog, version number, installer, GitHub Release) is made with the Claude Code `/release`
-skill.
+A release is prepared with the Claude Code `/release` skill (changelog, version number, tag); pushing the
+tag starts the [Release workflow](.github/workflows/release.yml), which builds and signs the installer and
+publishes the GitHub Release with the `latest.json` file read by the in-app updater
+([`.signpath/`](.signpath/README.md) describes the code signing setup, in French).
 
 ## License
 
