@@ -7,6 +7,15 @@ src/lib/releaseNotes.test.ts fait échouer les tests s'il dérive ou si la derni
 pas à package.json, src-tauri/tauri.conf.json et src-tauri/Cargo.toml.
 -->
 
+## 0.5.3 — 2026-11-24 — Nouveaux habillages
+
+### Nouveautés
+- **Cinq nouveaux habillages.** Dans Paramètres > Général > Apparence > Habillage, chacun en thème
+  clair et sombre : Classique, le premier style de l’app ; Ardoise, en bleu ardoise, orange et
+  pervenche ; Néon, un coucher de soleil le jour et des néons la nuit ; Pirate, parchemin, encre
+  sépia et or ; Monochrome, en noir et blanc, où seuls « Démarrer » et les boutons
+  « Enregistrer… » sont en rouge.
+
 ## 0.5.2 — 2026-11-24
 
 ### Corrections
