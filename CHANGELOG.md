@@ -7,6 +7,12 @@ src/lib/releaseNotes.test.ts fait échouer les tests s'il dérive ou si la derni
 pas à package.json, src-tauri/tauri.conf.json et src-tauri/Cargo.toml.
 -->
 
+## 0.5.2 — 2026-11-24
+
+### Corrections
+- **Mises à jour automatiques rétablies.** SealedScribe recherche à nouveau les mises à jour tout seul,
+  15 secondes après le lancement puis toutes les 6 heures ; les versions 0.5.0 et 0.5.1 ne le faisaient pas.
+
 ## 0.5.1 — 2026-11-23 — Visite guidée
 
 ### Nouveautés
