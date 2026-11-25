@@ -17,10 +17,18 @@ Conséquences pour les choix techniques :
 - Versions alpha / beta / `next` acceptées (ex. Tauri 3 alpha) si elles apportent quelque chose.
 - Drapeaux expérimentaux ou non supportés acceptés (ex. arguments WebView2 `--enable-features=...`).
 - Pas besoin de compatibilité multi-OS ni de rétrocompatibilité des données.
-- Signature Windows : uniquement des voies gratuites, pas de certificat payant. Voie retenue : une version
-  Microsoft Store (paquet MSIX, signé par Microsoft à la publication), en préparation. SignPath Foundation
-  a refusé le 2026-11-25 (projet trop jeune) : à redemander plus tard, mise en place dans `.signpath/README.md`.
-- Mise à jour automatique : plugin updater de Tauri (`src-tauri/src/updates.rs`, bandeau `UpdateBanner`), qui
+- Signature Windows : uniquement des voies gratuites, pas de certificat payant. Voie retenue : la version
+  Microsoft Store (paquet MSIX, signé par Microsoft à la publication). SignPath Foundation a refusé le
+  2026-11-25 (projet trop jeune) : à redemander plus tard, mise en place dans `.signpath/README.md`.
+- Deux distributions du même `meetscribe.exe`, distinguées à l'exécution (`src-tauri/src/distribution.rs`,
+  identité de paquet) :
+  - installeur NSIS des GitHub Releases : mise à jour par le bandeau, lancement au démarrage par la clé
+    `Run` (plugin autostart) ;
+  - paquet MSIX du Microsoft Store (produit `9PLMZ0VZGS28`, identité `ACivilise.SealedScribe`) : pas de
+    mise à jour par GitHub (règle du Store), lancement au démarrage par la tâche de démarrage du
+    manifeste `packaging/msix/AppxManifest.xml`, paquet fabriqué par `packaging/msix/build-msix.sh`.
+    Windows isole ses écritures dans `%LOCALAPPDATA%` et le registre.
+- Mise à jour automatique (version installeur seulement) : plugin updater de Tauri (`src-tauri/src/updates.rs`, bandeau `UpdateBanner`), qui
   lit `latest.json` dans la dernière GitHub Release et n'accepte qu'un installeur signé par la clé de mise à
   jour (clé publique dans `tauri.conf.json` ; clé privée sur le poste de l'auteur et dans le secret GitHub
   `TAURI_SIGNING_PRIVATE_KEY` du dépôt, pour le workflow de release).
@@ -33,6 +41,8 @@ Conséquences pour les choix techniques :
   `package.json`, `src-tauri/tauri.conf.json` et `src-tauri/Cargo.toml`.
 - Les releases sont construites par `.github/workflows/release.yml` à chaque tag `vX.Y.Z`, sur les machines
   Windows de GitHub (exigence de SignPath), et publiées dans les GitHub Releases du dépôt public (installeur
-  NSIS, `latest.json`). `package-lock.json` et `src-tauri/Cargo.lock` sont versionnés : le build utilise
-  `--locked`, donc une montée de version les met à jour aussi.
+  NSIS, `latest.json`). Le paquet MSIX du même run reste dans ses artefacts : il est soumis à la main dans
+  l'Espace partenaires, puis certifié par Microsoft (quelques heures à 3 jours ouvrés).
+  `package-lock.json` et `src-tauri/Cargo.lock` sont versionnés : le build utilise `--locked`, donc une
+  montée de version les met à jour aussi.
   Procédure complète : skill `/release`.

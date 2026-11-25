@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { invoke } from '@tauri-apps/api/core';
@@ -7,6 +7,7 @@ import type { UserPreferences } from '../../services/preferencesService';
 import type { LocalLlmModel } from '../../services/summaryService';
 import { useSkinStore } from '../../store/skinStore';
 import { useOnboardingStore } from '../../store/onboardingStore';
+import { useUpdateStore } from '../../store/updateStore';
 import { TOUR_STEPS } from '../../lib/onboarding';
 
 vi.mock('@tauri-apps/api/core', () => ({ invoke: vi.fn() }));
@@ -240,6 +241,38 @@ describe('SettingsModal — habillage', () => {
     expect(useSkinStore.getState().skin).toBe('cassette');
     expect(document.documentElement.dataset.skin).toBe('cassette');
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+describe('SettingsModal — version Microsoft Store', () => {
+  beforeEach(() => {
+    useUpdateStore.setState({ distribution: 'store' });
+  });
+
+  afterEach(() => {
+    useUpdateStore.setState({ distribution: null });
+  });
+
+  it('ne propose pas de rechercher une mise à jour : le Store s’en charge', async () => {
+    mockBackend(prefs(), async () => []);
+    render(<SettingsModal onClose={vi.fn()} />);
+
+    expect(await screen.findByText('Updates come from the Microsoft Store.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Check for updates' })).not.toBeInTheDocument();
+  });
+
+  it('explique comment réactiver le lancement au démarrage coupé dans Windows', async () => {
+    mockBackend(prefs(), async () => []);
+    const backend = vi.mocked(invoke).getMockImplementation()!;
+    vi.mocked(invoke).mockImplementation(async (command, args) =>
+      command === 'set_launch_at_startup' ? Promise.reject('startup-disabled-by-user') : backend(command, args)
+    );
+    render(<SettingsModal onClose={vi.fn()} />);
+
+    await userEvent.click(await screen.findByRole('checkbox', { name: 'Start SealedScribe when Windows starts' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByText(/turn SealedScribe back on in Settings > Apps > Startup/)).toBeInTheDocument();
   });
 });
 

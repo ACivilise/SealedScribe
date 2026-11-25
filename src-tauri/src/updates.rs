@@ -20,6 +20,8 @@ pub const UPDATE_PROGRESS_EVENT: &str = "update-progress";
 const BUSY_RECORDING: &str = "busy-recording";
 const BUSY_JOB: &str = "busy-job";
 const NO_UPDATE: &str = "no-update";
+/// Version Store : les mises à jour passent par le Store (l'interface ne propose pas ces commandes).
+const STORE_MANAGED: &str = "store-managed";
 
 /// Version plus récente que celle qui tourne.
 #[derive(Debug, Clone, Serialize)]
@@ -41,6 +43,9 @@ struct UpdateProgress {
 /// Cherche une version plus récente que celle qui tourne ; `None` si l'application est à jour.
 #[tauri::command]
 pub async fn check_for_update(app: AppHandle) -> Result<Option<AvailableUpdate>, String> {
+    if crate::distribution::is_packaged() {
+        return Err(STORE_MANAGED.into());
+    }
     let update = app
         .updater()
         .map_err(|e| e.to_string())?
@@ -63,6 +68,9 @@ pub async fn install_update(
     audio: State<'_, AudioRecordingService>,
     jobs: State<'_, JobManager>,
 ) -> Result<(), String> {
+    if crate::distribution::is_packaged() {
+        return Err(STORE_MANAGED.into());
+    }
     if audio.is_recording() {
         return Err(BUSY_RECORDING.into());
     }

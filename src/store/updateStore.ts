@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { updateService, type AvailableUpdate, type UpdateProgress } from '../services/updateService';
+import { updateService, type AvailableUpdate, type Distribution, type UpdateProgress } from '../services/updateService';
 
 /**
  * `available` : une version plus récente attend ; `downloading` puis `installing` : l'installation
@@ -14,6 +14,12 @@ export type UpdateError = 'busy' | 'failed';
 export type CheckOutcome = 'upToDate' | 'available' | 'failed';
 
 interface UpdateStore {
+  /**
+   * Version du Microsoft Store : le Store fait les mises à jour, l'application n'en cherche pas.
+   * `null` tant que le backend n'a pas répondu.
+   */
+  distribution: Distribution | null;
+  loadDistribution: () => Promise<void>;
   status: UpdateStatus;
   available: AvailableUpdate | null;
   progress: UpdateProgress | null;
@@ -28,12 +34,24 @@ interface UpdateStore {
 }
 
 export const useUpdateStore = create<UpdateStore>((set, get) => ({
+  distribution: null,
   status: 'idle',
   available: null,
   progress: null,
   error: null,
   dismissedVersion: null,
   checking: false,
+
+  loadDistribution: async () => {
+    if (get().distribution) return;
+    try {
+      const distribution = await updateService.distribution();
+      set({ distribution: distribution === 'store' ? 'store' : 'installer' });
+    } catch (error) {
+      console.warn('Distribution inconnue, mises à jour par GitHub :', error);
+      set({ distribution: 'installer' });
+    }
+  },
 
   check: async ({ manual = false } = {}) => {
     const { status } = get();

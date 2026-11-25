@@ -16,9 +16,16 @@ export interface UpdateProgress {
 }
 
 /** Codes d'erreur de `install_update` (backend `updates.rs`). */
-export type UpdateErrorCode = 'busy-recording' | 'busy-job' | 'no-update';
+export type UpdateErrorCode = 'busy-recording' | 'busy-job' | 'no-update' | 'store-managed';
+
+/**
+ * `installer` : installeur des GitHub Releases, mis à jour par le bandeau ;
+ * `store` : paquet du Microsoft Store, mis à jour par le Store (backend `distribution.rs`).
+ */
+export type Distribution = 'installer' | 'store';
 
 export const updateService = {
+  distribution: () => invoke<Distribution>('get_distribution'),
   /** `null` : l'application est à jour. */
   check: () => invoke<AvailableUpdate | null>('check_for_update'),
   /** Télécharge, vérifie la signature et lance l'installeur ; l'application se ferme ensuite. */

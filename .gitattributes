@@ -1,0 +1,2 @@
+# Scripts bash : toujours en LF, y compris sur les machines Windows (bash refuse les CRLF).
+*.sh text eol=lf

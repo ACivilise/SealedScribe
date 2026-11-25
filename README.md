@@ -132,7 +132,7 @@ name, so that existing data is kept:
 | Mistral AI (`api.mistral.ai`) | The audio and the vocabulary list terms; the transcript and the prompt | Mistral transcription engine; summary with Mistral AI |
 | Microsoft Entra ID (`login.microsoftonline.com`) | Your identity | Microsoft sign-in turned on |
 | GitHub and Hugging Face | Nothing (download, checked by SHA-256 hash) | Local engine installation |
-| GitHub (`github.com`) | Nothing (version check; installer download when you accept the update) | Update check: 15 seconds after launch, then every 6 hours, and "Check for updates" |
+| GitHub (`github.com`) | Nothing (version check; installer download when you accept the update) | Update check (installer version only, the Microsoft Store version is updated by the Store): 15 seconds after launch, then every 6 hours, and "Check for updates" |
 | Google Fonts | Nothing (font download) | Displaying the interface |
 
 With the local transcription engine and a local summary (or no summary), neither the audio nor the text of

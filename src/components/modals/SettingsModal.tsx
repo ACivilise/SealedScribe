@@ -145,6 +145,8 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
   const checkForUpdate = useUpdateStore((state) => state.check);
   const checkingUpdate = useUpdateStore((state) => state.checking);
   const availableVersion = useUpdateStore((state) => state.available?.version);
+  const distribution = useUpdateStore((state) => state.distribution);
+  const loadDistribution = useUpdateStore((state) => state.loadDistribution);
   const [updateOutcome, setUpdateOutcome] = useState<CheckOutcome | null>(null);
   const setSkin = useSkinStore((state) => state.setSkin);
   const { t, intlLocale, formatDate } = useT();
@@ -212,6 +214,10 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
       })
       .catch((error) => console.error('Failed to read startup setting:', error));
   }, []);
+
+  useEffect(() => {
+    void loadDistribution();
+  }, [loadDistribution]);
 
   const updateDraft = (changes: Partial<UserPreferences>) =>
     setPreferences((prev) => (prev ? { ...prev, ...changes } : prev));
@@ -281,7 +287,15 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
           setSavedLaunchAtStartup(launchAtStartup);
         } catch (error) {
           console.error('Failed to update startup setting:', error);
-          throw new Error(t('settings.startupFailed'));
+          // Version Store : codes de `distribution.rs` (tâche de démarrage coupée hors de l'app).
+          const code = String(error);
+          throw new Error(
+            code.includes('startup-disabled-by-user')
+              ? t('settings.startupDisabledByUser')
+              : code.includes('startup-disabled-by-policy')
+                ? t('settings.startupDisabledByPolicy')
+                : t('settings.startupFailed')
+          );
         }
       }
       if (hasSpeechInput || hasAiInput || hasMistralInput) {
@@ -737,17 +751,22 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                   </Button>
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={checkingUpdate}
-                    onClick={async () => setUpdateOutcome(await checkForUpdate({ manual: true }))}
-                  >
-                    {checkingUpdate ? t('update.checking') : t('update.check')}
-                  </Button>
+                  {distribution !== 'store' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={checkingUpdate}
+                      onClick={async () => setUpdateOutcome(await checkForUpdate({ manual: true }))}
+                    >
+                      {checkingUpdate ? t('update.checking') : t('update.check')}
+                    </Button>
+                  )}
                   <Button variant="outline" size="sm" onClick={startTour}>
                     {t('settings.replayTour')}
                   </Button>
+                  {distribution === 'store' && (
+                    <span className="text-xs text-muted-foreground">{t('update.managedByStore')}</span>
+                  )}
                   {updateOutcome && !checkingUpdate && (
                     <span role="status" className="text-xs text-muted-foreground">
                       {updateOutcome === 'upToDate'

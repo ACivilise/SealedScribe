@@ -23,6 +23,22 @@ beforeEach(() => {
 });
 
 describe('UpdateBanner', () => {
+  it('version Microsoft Store : ni bandeau ni recherche sur GitHub', () => {
+    vi.useFakeTimers();
+    try {
+      const check = vi.fn().mockResolvedValue('upToDate');
+      useUpdateStore.setState({ distribution: 'store', check });
+      const { container } = render(<UpdateBanner automaticChecks />);
+
+      vi.advanceTimersByTime(24 * 60 * 60 * 1000);
+      expect(container).toBeEmptyDOMElement();
+      expect(check).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+      useUpdateStore.setState({ distribution: null });
+    }
+  });
+
   it('ne s’affiche pas sans nouvelle version', () => {
     useUpdateStore.setState({ status: 'idle', available: null });
     const { container } = render(<UpdateBanner automaticChecks={false} />);

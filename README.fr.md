@@ -139,7 +139,7 @@ Tout se règle dans la fenêtre **Paramètres**, et rien n’est obligatoire pou
 | Mistral AI (`api.mistral.ai`) | L’audio et les termes des lexiques ; la transcription et le prompt | Moteur de transcription Mistral ; résumé avec Mistral AI |
 | Microsoft Entra ID (`login.microsoftonline.com`) | Votre identité | Connexion Microsoft activée |
 | GitHub et Hugging Face | Rien (téléchargement, vérifié par empreinte SHA-256) | Installation du moteur local |
-| GitHub (`github.com`) | Rien (vérification de version ; téléchargement de l’installeur si vous acceptez la mise à jour) | Recherche de mise à jour : 15 secondes après le lancement, puis toutes les 6 heures, et « Rechercher une mise à jour » |
+| GitHub (`github.com`) | Rien (vérification de version ; téléchargement de l’installeur si vous acceptez la mise à jour) | Recherche de mise à jour (version installeur seulement, la version Microsoft Store est mise à jour par le Store) : 15 secondes après le lancement, puis toutes les 6 heures, et « Rechercher une mise à jour » |
 | Google Fonts | Rien (téléchargement de la police) | Affichage de l’interface |
 
 Avec le moteur de transcription local et un résumé local (ou sans résumé), ni l’audio ni le texte des

@@ -3,8 +3,10 @@
 # Tag vX.Y.Z (poussé par la skill /release) : build, signature Windows par SignPath Foundation
 # (quand elle est configurée), signature de mise à jour, puis GitHub Release avec l'installeur et
 # latest.json (lu par la mise à jour automatique des versions installées).
+# Le paquet MSIX du Microsoft Store reste dans les artefacts du run : il est envoyé à la main dans
+# l'Espace partenaires (produit 9PLMZ0VZGS28), qui le signe à la publication.
 # Lancement manuel (Actions > Release > Run workflow) : même build, sans publication ; l'installeur
-# reste dans les artefacts du run.
+# et le paquet MSIX restent dans les artefacts du run.
 #
 # Réglages du dépôt (Settings > Secrets and variables > Actions) :
 # - secret TAURI_SIGNING_PRIVATE_KEY : contenu de la clé privée de mise à jour (sans mot de passe) ;
@@ -110,6 +112,20 @@ jobs:
       - name: Remplacer l'exe par l'exe signé
         if: env.SIGNPATH_ENABLED == 'true'
         run: cp signed-app/meetscribe.exe src-tauri/target/release/meetscribe.exe
+
+      # Même exe que l'installeur : l'app détecte à l'exécution qu'elle tourne dans son paquet.
+      - name: Construire le paquet MSIX (Microsoft Store)
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: bash packaging/msix/build-msix.sh "$VERSION"
+
+      - name: Garder le paquet MSIX dans les artefacts du run
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: SealedScribe-${{ steps.version.outputs.version }}-msix
+          path: src-tauri/target/msix/SealedScribe_${{ steps.version.outputs.version }}.0_x64.msix
+          if-no-files-found: error
+          retention-days: 30
 
       # `--no-binary-patching` : Tauri ne retouche pas l'exe (sa signature resterait invalide).
       # Le module de mise à jour reconnaît l'installeur NSIS à son contenu. La signature de mise à

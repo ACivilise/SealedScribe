@@ -704,8 +704,14 @@ pub fn quit_app(app_handle: AppHandle) {
 }
 
 /// Indique si SealedScribe est lancé automatiquement au démarrage de Windows.
+/// Version Store : tâche de démarrage du paquet ; installeur : clé `Run` du plugin autostart.
 #[tauri::command]
 pub fn get_launch_at_startup(app_handle: AppHandle) -> TauriResult<bool> {
+    if crate::distribution::is_packaged() {
+        return crate::distribution::startup_task::state()
+            .map(|state| state.is_enabled())
+            .map_err(to_tauri_error);
+    }
     app_handle
         .autostart()
         .is_enabled()
@@ -713,8 +719,19 @@ pub fn get_launch_at_startup(app_handle: AppHandle) -> TauriResult<bool> {
 }
 
 /// Active ou désactive le lancement automatique au démarrage de Windows.
+/// Version Store : si l'utilisateur l'a coupé dans les paramètres Windows, seul lui peut le
+/// réactiver (code `startup-disabled-by-user`, traduit par l'interface).
 #[tauri::command]
 pub fn set_launch_at_startup(enabled: bool, app_handle: AppHandle) -> TauriResult<()> {
+    if crate::distribution::is_packaged() {
+        use crate::distribution::startup_task;
+        let result = if enabled {
+            startup_task::enable().and_then(|state| state.enable_outcome())
+        } else {
+            startup_task::disable()
+        };
+        return result.map_err(to_tauri_error);
+    }
     let autolaunch = app_handle.autostart();
     let result = if enabled {
         autolaunch.enable()

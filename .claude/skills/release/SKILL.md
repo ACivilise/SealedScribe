@@ -1,6 +1,6 @@
 ---
 name: release
-description: Publie une version de SealedScribe. Met à jour CHANGELOG.md (affiché dans « Nouveautés »), monte la version, pousse le tag ; le workflow GitHub Actions construit l'installeur NSIS, le fait signer par SignPath et publie la GitHub Release. À utiliser pour « release », « publier une version », « mettre à jour le changelog », « builder l'installeur », « pousser l'exe sur GitHub ». Argument facultatif : la version (ex. `0.2.0`).
+description: Publie une version de SealedScribe. Met à jour CHANGELOG.md (affiché dans « Nouveautés »), monte la version, pousse le tag ; le workflow GitHub Actions construit l'installeur NSIS (signé par SignPath quand c'est configuré) et le paquet MSIX, publie la GitHub Release, puis le paquet est soumis au Microsoft Store. À utiliser pour « release », « publier une version », « mettre à jour le changelog », « builder l'installeur », « pousser l'exe sur GitHub », « publier sur le Store ». Argument facultatif : la version (ex. `0.2.0`).
 ---
 
 # Release SealedScribe
@@ -9,7 +9,8 @@ Une release = une section du `CHANGELOG.md` + la même version dans les fichiers
 `vX.Y.Z`. Le tag poussé lance `.github/workflows/release.yml`, qui construit l'installeur NSIS sur une
 machine Windows de GitHub, le fait signer par SignPath Foundation (quand c'est configuré, voir
 `.signpath/README.md`), le signe pour la mise à jour automatique et publie la GitHub Release (dépôt
-public `ACivilise/SealedScribe`) avec `latest.json`.
+public `ACivilise/SealedScribe`) avec `latest.json`. Le même run fabrique le paquet MSIX du Microsoft Store
+(artefact du run), soumis ensuite dans l'Espace partenaires (étape 7).
 `src/lib/releaseNotes.test.ts` est la **garde** : il échoue si le changelog sort du format ou si sa
 dernière version diffère de celle des fichiers de version.
 
@@ -141,10 +142,32 @@ Ne jamais pousser vers `origin` les tags ou l'historique du remote `archive` (an
 `latest.json`, et que `curl -sL https://github.com/ACivilise/SealedScribe/releases/latest/download/latest.json`
 renvoie la nouvelle version (c'est ce que lisent les applications installées).
 
-### 7. Rapport
+### 7. Microsoft Store
 
-URL de la release, version et taille de l'installeur (dépôt public : téléchargeable sans compte GitHub),
-installeur signé par SignPath ou non.
+Le run du tag garde le paquet dans ses artefacts. Le récupérer :
+
+```bash
+gh run download <id> --repo ACivilise/SealedScribe -n SealedScribe-X.Y.Z-msix -D "<scratchpad>/msix-X.Y.Z"
+```
+
+Puis, dans Chrome (Claude in Chrome), sur l'Espace partenaires. Le compte Microsoft perso de l'utilisateur
+y est connecté par lui, jamais par Claude.
+`https://partner.microsoft.com/dashboard/products/9PLMZ0VZGS28/overview` :
+1. Mettre à jour la soumission en cours ou en créer une.
+2. Dans Packages, retirer l'ancien paquet et déposer `SealedScribe_X.Y.Z.0_x64.msix`. Sa version `X.Y.Z.0`
+   doit dépasser celle de la dernière soumission.
+3. Dans la fiche du Store, mettre la section du changelog dans « Nouveautés de cette version ».
+4. **L'utilisateur** clique sur « Soumettre au Store ». C'est une action publique.
+
+La certification prend de quelques heures à 3 jours ouvrés.
+**Fait quand** la soumission est « En certification ».
+
+### 8. Rapport
+
+- URL de la release ;
+- version et taille de l'installeur. Le dépôt est public : l'installeur se télécharge sans compte GitHub ;
+- installeur signé par SignPath ou non ;
+- état de la soumission au Store.
 
 ---
 
@@ -187,3 +210,6 @@ git push origin vX.Y.Z
 GH_TOKEN="$(gh auth token --user ACivilise)" gh release create vX.Y.Z "$EXE" "$LATEST" \
   --repo ACivilise/SealedScribe --verify-tag --title "SealedScribe X.Y.Z" --notes-file "$NOTES"
 ```
+
+Paquet du Store en secours : `bash packaging/msix/build-msix.sh X.Y.Z` après le build. Il réutilise
+`src-tauri/target/release/meetscribe.exe`, puis on suit l'étape 7 avec `src-tauri/target/msix/`.

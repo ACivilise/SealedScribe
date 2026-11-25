@@ -42,18 +42,26 @@ export function UpdateBanner({ automaticChecks = !import.meta.env.DEV }: UpdateB
   const check = useUpdateStore((s) => s.check);
   const install = useUpdateStore((s) => s.install);
   const dismiss = useUpdateStore((s) => s.dismiss);
+  const distribution = useUpdateStore((s) => s.distribution);
+  const loadDistribution = useUpdateStore((s) => s.loadDistribution);
   const busy = useIsBusy();
 
   useEffect(() => {
-    if (!automaticChecks) return;
+    void loadDistribution();
+  }, [loadDistribution]);
+
+  // Version du Microsoft Store : le Store fait les mises à jour, aucune recherche sur GitHub.
+  useEffect(() => {
+    if (!automaticChecks || distribution !== 'installer') return;
     const first = setTimeout(() => void check(), FIRST_CHECK_DELAY_MS);
     const every = setInterval(() => void check(), CHECK_INTERVAL_MS);
     return () => {
       clearTimeout(first);
       clearInterval(every);
     };
-  }, [automaticChecks, check]);
+  }, [automaticChecks, distribution, check]);
 
+  if (distribution === 'store') return null;
   if (!available || (status === 'available' && dismissedVersion === available.version)) return null;
 
   const inProgress = status === 'downloading' || status === 'installing';

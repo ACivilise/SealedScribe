@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Manifeste du paquet MSIX de SealedScribe (Microsoft Store), rempli par build-msix.sh :
+  __VERSION__ devient X.Y.Z.0 (le Store réserve le quatrième nombre).
+  Identité : valeurs de l'Espace partenaires (produit 9PLMZ0VZGS28). Elles et le TaskId de la tâche
+  de démarrage (constante STARTUP_TASK_ID de src-tauri/src/distribution.rs) sont vérifiés par
+  src/lib/msixManifest.test.ts.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap desktop rescap">
+
+  <Identity
+    Name="ACivilise.SealedScribe"
+    Publisher="CN=66CDA9B1-2B15-4216-AC2A-715F732053D3"
+    Version="__VERSION__"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>SealedScribe</DisplayName>
+    <PublisherDisplayName>ACivilise</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <!-- WebView2 est inclus dans Windows 11 ; Windows 10 1809 au minimum. -->
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-US" />
+    <Resource Language="fr-FR" />
+  </Resources>
+
+  <Applications>
+    <Application Id="SealedScribe" Executable="meetscribe.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="SealedScribe"
+        Description="Records, transcribes and summarizes meetings"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png" />
+      <Extensions>
+        <!-- Lancement au démarrage (Paramètres de l'app) : le registre d'un paquet est isolé. -->
+        <desktop:Extension Category="windows.startupTask" Executable="meetscribe.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="SealedScribeStartup" Enabled="false" DisplayName="SealedScribe" />
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- Application de bureau (Tauri) : processus complet, pas de bac à sable UWP. -->
+    <rescap:Capability Name="runFullTrust" />
+    <!-- Enregistrement des réunions : Windows demande l'accès au micro. -->
+    <DeviceCapability Name="microphone" />
+  </Capabilities>
+</Package>

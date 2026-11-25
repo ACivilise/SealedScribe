@@ -5,6 +5,7 @@ mod models;
 mod error;
 mod services;
 mod commands;
+mod distribution;
 mod tray;
 mod updates;
 
@@ -81,7 +82,10 @@ fn main() {
             services::recording_watch::watch_sleep(app.handle().clone());
             // Lancement automatique : fenêtre masquée, seule l'icône tray est visible.
             // Aucun flux audio n'est ouvert ici : l'enregistrement reste une action explicite.
-            if std::env::args().any(|arg| arg == START_MINIMIZED_ARG) {
+            // Installeur : clé Run avec `--minimized` ; Store : tâche de démarrage, sans argument.
+            if std::env::args().any(|arg| arg == START_MINIMIZED_ARG)
+                || distribution::launched_by_startup_task()
+            {
                 tray::hide_main_window(app.handle());
             }
             Ok(())
@@ -116,6 +120,7 @@ fn main() {
             commands::get_launch_at_startup,
             commands::set_launch_at_startup,
             // Update commands
+            distribution::get_distribution,
             updates::check_for_update,
             updates::install_update,
             // Job commands
