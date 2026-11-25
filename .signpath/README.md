@@ -1,6 +1,9 @@
 # Signature Windows par SignPath Foundation
 
-SealedScribe demande la signature gratuite des projets libres de [SignPath Foundation](https://signpath.org).
+SealedScribe a demandé la signature gratuite des projets libres de [SignPath Foundation](https://signpath.org).
+**Première candidature refusée le 2026-11-25** : projet trop jeune (réputation). À redemander plus tard ;
+remettre alors en tête de la section « Code signing policy » des deux README leur ligne d'attribution,
+mot pour mot : `Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).`
 La politique publique est dans le README, section « Code signing policy ». Ce dossier contient ce qu'il
 faut recopier dans SignPath ; le build et l'envoi des fichiers à signer sont dans
 [`.github/workflows/release.yml`](../.github/workflows/release.yml).

@@ -17,8 +17,9 @@ Conséquences pour les choix techniques :
 - Versions alpha / beta / `next` acceptées (ex. Tauri 3 alpha) si elles apportent quelque chose.
 - Drapeaux expérimentaux ou non supportés acceptés (ex. arguments WebView2 `--enable-features=...`).
 - Pas besoin de compatibilité multi-OS ni de rétrocompatibilité des données.
-- Signature Windows (Authenticode) : uniquement la voie gratuite des projets libres, SignPath Foundation
-  (candidature à faire ou en cours ; mise en place dans `.signpath/README.md`). Pas de certificat payant.
+- Signature Windows : uniquement des voies gratuites, pas de certificat payant. Voie retenue : une version
+  Microsoft Store (paquet MSIX, signé par Microsoft à la publication), en préparation. SignPath Foundation
+  a refusé le 2026-11-25 (projet trop jeune) : à redemander plus tard, mise en place dans `.signpath/README.md`.
 - Mise à jour automatique : plugin updater de Tauri (`src-tauri/src/updates.rs`, bandeau `UpdateBanner`), qui
   lit `latest.json` dans la dernière GitHub Release et n'accepte qu'un installeur signé par la clé de mise à
   jour (clé publique dans `tauri.conf.json` ; clé privée sur le poste de l'auteur et dans le secret GitHub

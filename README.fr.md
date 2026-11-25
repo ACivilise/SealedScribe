@@ -66,19 +66,17 @@ Prérequis :
 
 ## Politique de signature du code (Code signing policy)
 
-Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
-
 > [!NOTE]
-> La signature par SignPath Foundation est en cours de mise en place : d’ici là, les installeurs sont
-> publiés sans signature Windows.
+> Les installeurs n’ont pas encore de signature Windows. Une version Microsoft Store, signée par
+> Microsoft, est en préparation, et la signature gratuite des projets libres sera redemandée quand le
+> projet sera mieux établi.
 
-- **Ce qui est signé :** uniquement les fichiers construits à partir du code de ce dépôt, l’application
+- **Ce qui sera signé :** uniquement les fichiers construits à partir du code de ce dépôt, l’application
   (`meetscribe.exe`) et son installeur. Les moteurs de transcription et de séparation des voix et les
   modèles que l’app télécharge à la demande (whisper.cpp, sherpa-onnx, modèles hébergés sur Hugging Face)
   viennent de leurs propres projets et ne sont pas signés par SealedScribe.
 - **Comment :** chaque version est construite à partir d’un tag par le
-  [workflow Release](.github/workflows/release.yml), sur les machines de GitHub, puis signée par
-  SignPath. Chaque demande de signature est approuvée à la main.
+  [workflow Release](.github/workflows/release.yml), sur les machines de GitHub.
 - **Équipe et rôles :**
   - Committers and reviewers : [ACivilise](https://github.com/ACivilise)
   - Approvers : [ACivilise](https://github.com/ACivilise)
