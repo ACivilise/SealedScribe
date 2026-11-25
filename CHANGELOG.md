@@ -7,6 +7,15 @@ src/lib/releaseNotes.test.ts fait échouer les tests s'il dérive ou si la derni
 pas à package.json, src-tauri/tauri.conf.json et src-tauri/Cargo.toml.
 -->
 
+## 0.6.0 — 2026-11-25 — Microsoft Store
+
+### Nouveautés
+- **SealedScribe arrive sur le Microsoft Store.** Signée par Microsoft, cette version s’installe sans
+  l’avertissement de Windows SmartScreen, et le Store la tient à jour : Paramètres > Général > À propos
+  l’indique à la place du bouton « Rechercher une mise à jour ». Le lancement au démarrage y
+  fonctionne aussi ; s’il a été coupé dans les paramètres de Windows, SealedScribe indique où le
+  réactiver. L’installeur des GitHub Releases reste disponible et se met toujours à jour par le bandeau.
+
 ## 0.5.3 — 2026-11-24 — Nouveaux habillages
 
 ### Nouveautés

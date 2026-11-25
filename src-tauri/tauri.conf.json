@@ -1,6 +1,6 @@
 {
   "productName": "SealedScribe",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "identifier": "com.meetscribe.app",
   "build": {
     "beforeDevCommand": "npm run dev",
